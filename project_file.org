@@ -11,3 +11,7 @@ cp /home/mehdi/dossiers/programmation/emacs_lisp_ref.org ./
 #+end_src
 
 #+RESULTS:
+
+* But
+Ce repo est fait pour que Louna ai accès à toutes les petites choses
+qui me facilitent la vie sur ordinateur...  Joyeux anniversaire ! <3
