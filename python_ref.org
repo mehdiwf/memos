@@ -1,0 +1,664 @@
+* General rqs
+Code is more read than it is written
+[[https://www.python.org/dev/peps/pep-0008/][PEP8 recommandations]]
+
+Structuring your project
+[[https://docs.python-guide.org/writing/structure/][Python guide to structure a project]]
+* Commented code snippets
+** Before everything
+#+begin_src python :results output
+#!/usr/bin/env python3
+# coding: utf-8
+
+# librairy importation ...
+# Function and/or class definition...
+
+if __name__ == '__main__':
+
+    stuff
+
+#+end_src
+** General
+*** importing/loading .py files
+**** Same directory
+
+ [[https://www.freecodecamp.org/news/if-name-main-python-example/][How to import .py files and why __main__]]
+
+ let's say that your file script.py is in a directory ./ 
+ you also have data.py with a variable in it, defined with
+ =a=2=
+ you can:
+
+ #+begin_src python :results output
+ import data # or import data as d
+ # or (but I didn't test it yet)
+ # https://docs.python.org/3/library/importlib.html#importlib.import_module
+ from importlib import import_module as import_mod
+ module = 'data'
+ import_mod(module)
+
+ # returns true if data has a variable called b
+ print(hasattr(data, 'b')) 
+
+ # print the variable
+ print(data.a)
+
+ # Or if you don't know what will be the names of the things you're
+ # importing: dir(data) can tell you, if you filter it
+ imported_variables = [item for item in dir(data) if not item.startswith("__")]
+
+ for e in imported_variables:
+     #getattr gets the value of the variable e (e is a string)
+     print(getattr(data, e))
+ #you can also:
+ getattr(data, 'a')
+ #+end_src
+**** Other directory
+from [[https://stackoverflow.com/questions/22955684/how-to-import-py-file-from-another-directory][stack overflow question]]
+#+begin_src python :results output
+import sys
+sys.path.insert(0, 'path/to/your/py_file')
+
+import py_file
+#+end_src
+
+*** Files/Data
+**** Listing files
+***** All files
+You can list all the files in a directory and all the files in the
+subdirectories
+
+#+begin_src python :results output
+directory = ...
+data = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser(directory)) for f in fn]
+#+end_src
+
+***** Selecting all files with an extension
+
+#+begin_src python :results output
+# selecting all pdf files
+files_list = [y for x in os.walk(directory) for y in glob(os.path.join(x[0], '*.pdf'))]
+#+end_src
+
+
+**** Opening
+Ouvrir un fichier de manière safe:
+(Comme ça le fichier se ferme si besoin, en cas d'erreur ou quoi... ça évite beaucoup de bétises.)
+#+begin_src python :results output
+with open("file.txt","r") as fichier:
+    make some stuff
+#+end_src
+
+le "r" peut se remplacer par:
+r for reading – The file pointer is placed at the beginning of the file. This is the default mode.
+r+ Opens a file for both reading and writing. The file pointer will be at the beginning of the file.
+w Opens a file for writing only. Overwrites the file if the file exists. If the file does not exist, creates a new file for writing.
+w+ Opens a file for both writing and reading. Overwrites the existing file if the file exists. If the file does not exist, it creates a new file for reading and writing.
+rb Opens a file for reading only in binary format. The file pointer is placed at the beginning of the file.
+rb+ Opens a file for both reading and writing in binary format.
+wb+ Opens a file for both writing and reading in binary format. Overwrites the existing file if the file exists. If the file does not exist, it creates a new file for reading and writing.
+a Opens a file for appending. The file pointer is at the end of the file if the file exists. That is, the file is in the append mode. If the file does not exist, it creates a new file for writing.
+ab Opens a file for appending in binary format. The file pointer is at the end of the file if the file exists. That is, the file is in the append mode. If the file does not exist, it creates a new file for writing.
+a+ Opens a file for both appending and reading. The file pointer is at the end of the file if the file exists. The file opens in the append mode. If the file does not exist, it creates a new file for reading and writing.
+ab+ Opens a file for both appending and reading in binary format. The file pointer is at the end of the file if the file exists. The file opens in the append mode. If the file does not exist, it creates a new file for reading and writing.
+x open for exclusive creation, failing if the file already exists (Python 3)
+**** Skipping some rows
+
+#+begin_src python :results output
+extracted_data = np.loadtxt(lines, delimiter=delim, skiprows=1)
+#+end_src
+**** Modify the file
+to write:
+#+begin_src python :results output
+fichier.write('yikers')
+#+end_src
+
+**** Getting the size of files in a directory
+https://stackoverflow.com/questions/1392413/calculating-a-directorys-size-using-python
+
+#+begin_src python :results output
+import os
+sum(os.path.getsize(f) for f in os.listdir(directory) if os.path.isfile(f))
+#+end_src
+
+*** Types and their methods
+**** String
+***** String formating
+  #+begin_src python 
+  # par exemple quand on importe une image:
+  chemin = ...
+  iphoto = ...
+  img = scim.imread('{}{}.jpg'.format(chemin, iphoto))
+  #+end_src
+
+  #+begin_src python :results output
+  '{:.2f} - '.format(100*ratio_pixels)
+  #+end_src
+  #RS# Vous trouverez de nombreux exemples/tuto format sur
+  internet. Juste ici, `:` dit que l'on précise un format d'affichage,
+  `.2` signifie que l'on veut une précision de 2 chiffres après la
+  virgule, et `f` précise que nos valeurs doivent être interprétées
+  comme des flottants.
+***** Joining elements of a list of str
+#+begin_src python :results output
+liste = ["a", "b", "c"]
+print("\n".join(liste))
+#+end_src
+
+#+RESULTS:
+: a
+: b
+: c
+
+**** numpy arrays
+***** Masks
+****** exemple 1
+#+begin_src python :results output
+
+#deux premières colonnes et éléments >= 0
+Resultat=Resultat[Resultat[:,2] >= 0]
+
+#A, B des tableaux numpy de même dimensions, v une valeur
+A = B > v
+Nb = np.count_nonzero(A)
+#or : Nb = np.count_nonzero(B > v)
+#sommer les valeurs plus grandes que v de B:
+Sum = B[A].sum()
+
+#+end_src
+
+#+begin_src python :results output
+
+data_L[data_L > 90] = 180 - data_L[data_L > 90]
+
+#+end_src
+
+***** Sorting consistently
+#+begin_src python :results output
+
+idx = A.argsort()[::-1]   
+A = A[idx]
+B = B[:,idx]
+#+end_src
+
+***** Infos tableau
+ #+begin_src python :results output
+ n,p = tableau.shape
+ #+end_src
+
+***** Exemple tableau intensité
+ J'ai un tableau numpy qui s'appelle img, et je veux compter le nombre
+ de pixels au dessus d'une certaine valeur dans
+ nombre_pixels_lumineux. Je veux aussi l'intensité totale de tous les
+ pixels qui sont au dessus d'une certaine valeur.
+ #+begin_src python :results output
+ # Comptage des pixels lumineux
+ bright_pixels = img > valeur_limite
+ nombre_pixels_lumineux = np.count_nonzero(bright_pixels) # Or even: bright_pixels.sum()
+
+ # Calcul des intensités cumulées
+ intensite_pixels_allumes = img[bright_pixels].sum()
+ intensite = img[img > 25].sum()
+ #+end_src
+***** Indexing
+#+begin_src python :results output
+A[0::2,0::2]=0 # in odd lines set odd elemets
+A[1::2,1::2]=0 # in even lines set even elements
+#+end_src
+***** useful functions of numpy
+****** np.unique
+sorts an array and returns the sorted array without doublons
+#+begin_src python :results output
+np.unique
+#+end_src
+get the indices of an "array boolean expression"
+#+begin_src python :results output
+[row,column]=np.where(tri==i)
+#+end_src
+(tri is an array, i an integer)
+gets the indices (rows columns) of elements of tri equal to i
+****** testing float
+https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_almost_equal.html
+       np.almost equal or something sometimes
+       
+**** Classes
+ Un exemple:
+ #+begin_src python 
+ class Narvalo:
+     def __init__(self, nom, age):
+         self.nom = nom
+         self.age = age
+
+     def get_nom(self):
+         return self.nom
+
+     def get_age(self):
+         return self.age
+
+     def add_age(self, n):
+         self.age += n
+
+
+ class Etudiant(Narvalo):
+     def __init__(self, nom, age, ecole):
+         super().__init__(nom, age)
+         self.ecole = ecole
+
+     def get_ecole(self):
+         return self.ecole
+
+     # On pourrait par exemple définir une autre fonction utilisant une fonction de la classe supérieure,
+     # en écrivant super().fonction(....)
+
+
+ if __name__ == '__main__':
+     Mehdi = Narvalo('Mehdi', 23)
+
+     print(Mehdi.get_age())
+     print(Mehdi.get_nom())
+     print('Je vais ajouter une année')
+     Mehdi.add_age(1)
+     print(Mehdi.get_age())
+
+     Line = Etudiant('Line', 23, 'INSA')
+
+     print('On a créé une classe étudiant, avec dedans {}, qui a {} ans et est à {}'.format(Line.get_nom(), Line.get_age(), Line.get_ecole()))
+
+     if issubclassB(Etudiant, Narvalo):
+         print("Oui Etudiant est une subclasse de Narvalo")
+ #+end_src
+
+**** Fonctions
+ assert and multi affectation on return
+ #+begin_src python :results output
+ def f(x):
+     assert x != 0,"x should not be equal to zero"
+     return 1/x,x
+ a,b = f(0)
+ #+end_src
+
+ #+RESULTS:
+
+**** List
+***** Filtering
+ example using filter builtin function:
+ #+begin_src python :results output
+ ext_variables = filter(lambda e: not(e.startswith("__")), ext_variables)
+ #+end_src
+***** Remove
+remove an element from a list
+#+begin_src python :results output
+liste.remove(element)
+#+end_src
+
+***** getting the argument/index of an element
+#+begin_src python :results output
+liste = [1,2]
+print( liste.index(1))
+#+end_src
+
+#+RESULTS:
+: 0
+
+*** Python version
+#+begin_src python 
+from platform import python_version
+print(python_version())
+#+end_src
+ou:
+#+begin_src python 
+import sys
+sys.version
+#+end_src
+
+pour faire un test:
+#+begin_src python 
+#sys.version_info
+#assert sys.version_info >= (2, 5),"your version is less than 2.5"
+#+end_src
+*** Plot graph
+
+**** refrences
+https://scipy-lectures.org/intro/matplotlib/
+https://towardsdatascience.com/an-introduction-to-making-scientific-publication-plots-with-python-ea19dfa7f51e
+**** example graph
+#+begin_src python :results output
+#tracer un truc :
+import matplotlib.pyplot as plt
+
+fig = plt.figure(figsize=(10,10))
+
+ax = fig.add_subplot(1,2,1)
+ax.scatter(liste_U,liste_I)
+ax.plot(liste_U,liste_Iref)
+ax.set_xlabel('Tension (V)')
+ax.set_ylabel('Intensité (A)')
+
+ax = fig.add_subplot(1,2,2)
+plt.yscale('log')
+ax.scatter(liste_U,liste_I)
+ax.plot(liste_U,liste_Iref)
+ax.set_xlabel('Tension (V)')
+ax.set_ylabel('Intensité (A)')
+    
+#plus de contenu :
+    
+ax = fig.add_subplot(1,2,1)
+ax.plot(Resultat[:,0],Resultat[:,2],label='angle :{:.2f}°'.format(angle*180/np.pi))
+ax.set_xlabel('x(m)')
+ax.set_ylabel('y(m)')
+ax.legend()
+
+ax = fig.add_subplot(3,2,2)
+ax.set_xlabel('t(s)')
+ax.set_ylabel('Re')
+ax.plot(time,liste_Re)
+
+ax = fig.add_subplot(3,2,4)
+ax.set_xlabel('t(s)')
+ax.set_ylabel('Vx(m/s)')
+ax.plot(  time[:Resultat[:,1].size]  ,  Resultat[:,1])
+
+ax = fig.add_subplot(3,2,6)
+ax.set_xlabel('t(s)')
+ax.set_ylabel('Vy(m/s)')
+ax.plot(  time[:Resultat[:,3].size]  ,Resultat[:,3]  )
+
+#+end_src
+**** plot specific things
+plot logarithm x or y
+#+begin_src python :results output
+x_array = 1.2**np.arange(-20,11)
+y_array = function(k_array)
+plot = plt.plot(x_array,y_array)
+
+plt.semilogx()
+
+plt.show()
+#+end_src
+
+#+RESULTS:
+
+*** Fonctions
+**** inline functions
+inline function
+a function without def
+#+begin_src python :results output
+lambda e: not(e.startswith("__"))
+#+end_src
+**** mapping functions to lists
+#+begin_src python :results output
+items = [1,2,3,4,5]
+def sqr(x): return x ** 2
+list(map(sqr, items))
+# or even
+list(map((lambda x: x**2), items))
+# this works too
+list(map((lambda x,y: x**2-y**2), items,items))
+#+end_src
+**** vectorising functions
+the output will always be an array
+:tip: be careful, it gives the illusion of speed but it's loops!
+#+begin_src python :results output
+np.vectorize(function)
+#+end_src
+*** Exceptions handling
+#+begin_src python :results output
+# if not everyone has the fast lib
+try:
+    from fastlib import xyz as foo
+except ImportError:
+    from defaultlib import abc as foo
+#+end_src
+** Particular
+*** Progress bar
+#+begin_src python :results output
+import sys
+def progress_bar(count, total, status=''):
+    bar_len = 30
+    filled_len = int(round(bar_len * count / float(total)))
+
+    percents = round(100.0 * count / float(total), 1)
+    bar = '|' * filled_len + '-' * (bar_len - filled_len)
+
+    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
+    sys.stdout.flush()
+#+end_src
+
+for ...:
+    progress_bar(i, max)
+
+*** Slow print
+#+begin_src python 
+import sys
+import time
+
+def slowprint(s):
+  for c in s + '\n':
+    sys.stdout.write(c)
+    sys.stdout.flush()
+    time.sleep(1/20)
+
+if __name__ == "__main__":
+  slowprint("This is a test of slowprint")
+#+end_src
+*** bash
+get bash output 
+and run bash command
+https://stackoverflow.com/questions/163542/how-do-i-pass-a-string-into-subprocess-popen-using-the-stdin-argument
+
+#+begin_src python :results output
+#!/usr/bin/env python3
+from subprocess import run, PIPE
+
+p = run(['grep', 'f'], stdout=PIPE,
+        input='one\ntwo\nthree\nfour\nfive\nsix\n', encoding='ascii')
+print(p.returncode)
+# -> 0
+print(p.stdout)
+# -> four
+# -> five
+# -> 
+
+#+end_src
+* pip and packages
+** pip
+dont forget to install pip via your package manager...
+** upgrade packages
+upgrade python packages: 
+write that in shell
+#+begin_comment
+python3 -m pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 python3 -m pip install -U
+#+end_comment
+
+* Other
+** Physique courses
+*** Computational statistical physics
+
+
+
+ - defining a new array
+
+ #+begin_src python :results output
+ import numpy as np
+ copied_array = 1.*your_array
+ #+end_src
+
+ - iterations in arrays, you can also do this:
+
+ #+begin_src python :results output
+ new_vx[i] *= -1
+ #+end_src
+
+** problèmes
+*** liste qui se remplit de la même val
+ #+begin_src python :results output
+ #!/usr/bin/env python3
+ import numpy as np
+ import matplotlib.pyplot as plt
+
+ # definition de la forme de la matrice utilisée
+ def matrix_A(a):
+     return np.array([[a,0,a],
+                      [0,a,-2],
+                      [a,1,8]])
+
+ # definition des valeurs parcourues pour la matrice
+ a = -12
+ b = 12
+ n_value = 20
+ value_list = np.linspace(a, b, n_value)
+
+ # génération de l'exemple
+ valeurs_propres = np.zeros((n_value,3))
+ vecteurs_propres = []
+ for i in range(n_value):
+     e = value_list[i]
+     A = matrix_A(e)
+     val_propre, vect_propre = np.linalg.eig(A)
+     valeurs_propres[i,:] = val_propre
+
+ # plot des valeurs propres de l'exemple
+ fig = plt.figure()
+ plt.plot(value_list, valeurs_propres[:,0])
+ plt.plot(value_list, valeurs_propres[:,1])
+ plt.plot(value_list, valeurs_propres[:,2])
+ plt.savefig('testfig.pdf')
+
+ valeurs_propres_ordonnees = np.zeros(np.shape(valeurs_propres))
+
+ def reorder_array(M, x_values):
+     """ 
+     returns a reordered version of lists in M 
+     lists are taken as columns
+     """
+     n_rows, n_columns = np.shape(M)
+     new_M = 1.*M
+    
+     order = [list(range(n_columns))]
+     for i in range(2, n_rows):
+         print('iteration: {}\n{}\n'.format(i,order))
+         last_step = x_values[i-1] - x_values[i-2]
+         next_step = x_values[i] - x_values[i-1]
+
+         derivative = (new_M[i-1,:] - new_M[i-2,:]) / last_step
+         expected_value = new_M[i-1, :] + derivative * next_step
+
+         expectation_error = np.abs(new_M[i, :] - expected_value)
+         mean_error = np.mean(expectation_error)
+
+         # :lkr:/ this sucks, :todo: later, make it proportional to
+         # values of the table
+         print('last ',order[-1])
+         if mean_error > 2:
+ #            print('{}\n'.format(mean_error))
+ #            print('max found for i = {}\nx={}'.format(i, x_values[i]))
+             sorted_errors = np.sort(expectation_error)
+             max1 = sorted_errors[-1]
+             max2 = sorted_errors[-2]
+             arg_col1 = np.where(expectation_error == max1)[0][0]
+             if max1 == max2:
+                 arg_col2 = np.where(expectation_error == max2)[0][1]
+             else:
+                 arg_col2 = np.where(expectation_error == max2)[0][0]
+ #            print('errors:\n{}\nargs computed:\n{}{}'.format(expectation_error, arg_col1, arg_col2))
+             new_M[i:, [arg_col1, arg_col2]] = new_M[i:, [arg_col2, arg_col1]]
+             new_order = order[-1]
+             swapping_values = new_order[arg_col2], new_order[arg_col1]
+             new_order[arg_col1], new_order[arg_col2] = swapping_values
+             order.append(new_order)
+         else: 
+             order.append(order[-1])
+     return np.array(order)
+
+ errors = reorder_array(valeurs_propres, value_list)
+
+ idx = valeurs_propres.argsort()[::-1]   
+
+ print('output: \n{}'.format(order))
+
+ fig = plt.figure()
+ plt.plot(value_list, valeurs_propres[:, 0], label='val_1')
+ plt.plot(value_list, valeurs_propres[:, 1])
+ plt.plot(value_list, valeurs_propres[:, 2])
+ plt.legend()
+ plt.savefig('testfig_errors.pdf')
+
+
+ # masks
+ # data_L[data_L > 90] = 180 - data_L[data_L > 90]
+ # # on réordonne tout en fonction de la valeur des valeurs propres
+ # idx = Leig.argsort()[::-1]   
+ # Leig = Leig[idx]
+ # Osci = Osci[:,idx]
+
+ #+end_src
+
+ liste chelou, .copy(), mais pq? :todo:
+ réglé en remplacant 
+             new_order = order[-1]
+ par 
+             new_order = order[-1].copy()
+
+*** imaginaires
+ :tip: ne pas utiliser i*() mais ()*1j
+** Souvenir rigolo
+ #+begin_src python :results output
+ #RS#            fichier.write("PARAMETRE : valeur_limite = ")
+ #RS#            fichier.write(str(valeur_limite)+'\n') #RS# Tes valeurs méritent un affichage digne de ce nom avec un format ! Si tu n'es pas familier encore avec cette méthode, découvre sa puissance (de toute façon, ça fait partie des trucs qu'on considère connus pour l'examen) :
+             fichier.write('PARAMETRE : valeur_limite = {}\n'.format(valeur_limite))
+             ##
+                 chemin = 'test'#'C:\\Users\\publi\\Desktop\\Cours ENS\\Rapport de TP\\O4\\Photos portable\\sans fer\\' #RS# Excellente initiative !
+ #RS#                img = scim.imread(chemin+str(iphoto)+'.jpg', flatten=True) #RS# Ici aussi, un format s'impose !
+                 img = scim.imread('{}{}.jpg'.format(chemin, iphoto), flatten=True)
+                 ##
+                 #RS# Je commente le bout de code ci-contre car je le renplace par un équivalent qui utilise toute l'incroyable puissance des tableaux Numpy !
+ #                #Création des conteurs et des variables
+ #                n,p = img.shape #RS# Oui !
+ #                nombre_pixels_lumineux = 0
+ #                intensite_pixels_allumes = 0
+ #                intensite = 0
+ #            
+ #                #On analyse chaque pixel
+ #                for i in range(n):
+ #                    for j in range(p):
+ #                        c = img[i][j] #RS# Ou là là, surtout pas, malheureux ! Où est donc passée la sensationnelle puissance des tableaux Numpy ? Ce code doit être particulièrement lent... Accroche-toi bien à ton siège, car avec le code que je m'en vais te proposer, ça va décoiffer !
+ #                        
+ #                        if c > valeur_limite:
+ #                            nombre_pixels_lumineux +=1 #RS# Attention aux espaces, PEP8 recommende : nombre_pixels_lumineux += 1
+ #                            intensite_pixels_allumes+=c
+ #                        if c > 25: #car sinon on prend en compte tout le fond noir, qui n'a pas une intensité nulle. Donc le ratio sera trop petit vu le nombre de pixels avec une une intensité non nulle #RS# Heu... Je dois avouer que je suis un peu perdu ici... Y aurait-il 3 classes de pixels : fond noir, éteins, allumés ?
+ #                            intensite += c
+ #                
+ #                #Calcul des ratios
+ #                ratio_pixels = nombre_pixels_lumineux/img.size
+ #                ratio_intensite = intensite_pixels_allumes/intensite
+                
+                 #RS# Vous l'attendez tous, le voici, le voilà, l'incroyable, le sensationnel, le magnifique... bout de code qui fait tout pareil, mais en formidablement plus rapide et résolument plus pythonique :
+                
+                 # Comptage des pixels lumineux
+                 bright_pixels = img > valeur_limite
+                 nombre_pixels_lumineux = np.count_nonzero(bright_pixels) # Or even: bright_pixels.sum()
+                
+                 # Calcul des intensités cumulées
+                 intensite_pixels_allumes = img[bright_pixels].sum()
+                 intensite = img[img > 25].sum()
+                
+                 #RS# Tout simplement ! Toute la quintessence des tableaux Numpy se retrouve ici, dans ce patchwork exquis de fonctionnalités Numpy avancées, en parfaite harmonie ! (mais qui sont quand même considérés comme connus pour l'examen... ^^)
+                 ##
+                 print(valeur_limite," et photo: ",iphoto)
+ #                fichier.write("photo ")
+ #                fichier.write(str(iphoto)+'\n')
+ #                fichier.write(str(nombre_pixels_lumineux)+'\n')
+ #                fichier.write(str(img.size)+'\n')
+ #                fichier.write(str(round(100*ratio_pixels,2))+' %'+'\n')
+ #                fichier.write(str(intensite_pixels_allumes)+'\n')
+ #                fichier.write(str(intensite)+'\n')
+ #                fichier.write(str(round(100*ratio_intensite,2))+' %'+'\n')
+ #                fichier.write('\n') #RS# Avec un petit coup de format, ça devient :
+                 fichier.write('photo {}\n'.format(iphoto))
+                 fichier.write('{}\n'.format(nombre_pixels_lumineux))
+                 fichier.write('{}\n'.format(img.size))
+                 fichier.write('{:.2f} %\n'.format(100*ratio_pixels)) #RS# Vous trouverez de nombreux exemples/tuto format sur internet. Juste ici, `:` dit que l'on précise un format d'affichage, `.2` signifie que l'on veut une précision de 2 chiffres après la virgule, et `f` précise que nos valeurs doivent être interprétées comme des flottants.
+                 ##
+ #+end_src

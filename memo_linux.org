@@ -1,0 +1,232 @@
+* Help
+** things done linux (à trier)
+Replace CapsLock with CTRL
+
+Most people don’t use the CapsLock key (unless you like YELLING ON THE INTERNET) so you can use this simple fix to replace it with the CTRL to make your Emacs life easier. Doing this will prevent you from having to bend your pinky down all day long to hit all those fabled Emacs keybindings, allowing you to keep your hands on the home row of the keyboard.
+
+Here’s how to do it across all 3 major operating systems:
+
+Linux
+
+There are many ways to accomplish this in Linux, but the easiest (and most repeatable) I’ve found is to use xmodmap. First, create a file named .Xmodmap in your home folder and populate it like so:
+
+clear lock
+clear control
+keycode 66 = Control_L
+add control = Control_L
+add Lock = Control_R
+
+This replaces CapsLock with control and also replaces the Ctrl key on the right side with CapsLock just in case you ever need to use it. Most login systems (GDM, KDM, etc) will load this file when you log in so you might not need to do anything extra for it to take effect, just log out and log back in again. If that doesn’t seem to work, you can add this line to one of your startup files (.xinitrc, .profile, window manager configuration, etc):
+
+xmodmap ~/.Xmodmap
+
+###############################################################################################
+layouts are listed in 
+man xkeyboard-config
+
+keymaps at
+localectl list-keymaps
+example:
+localectl list-keymaps | grep fr
+is useful
+
+setxkbmap -layout "fr(bepo)"
+to set the layout for one session 
+###############################################################################################
+for permanent changes:
+cd /etc/X11/xorg.conf.d/
+modify 00-keyboard.conf
+
+and put
+
+# Read and parsed by systemd-localed. It's probably wise not to edit this file
+# manually too freely.
+Section "InputClass"
+        Identifier "system-keyboard"
+        MatchIsKeyboard "on"
+        Option "XkbLayout" "fr(bepo),fr"
+        Option "XkbOptions" "ctrl:nocaps,grp:ctrls_toggle"
+        Option "XkbModel" "pc105"
+EndSection
+
+###############################################################################################
+vconsole.conf
+est le fichier dans /etc
+et il ne vaut mieux pas y toucher. il change le layout de la console qui apparaît quand on fait Ctrl Shift F2 à l'entrée de X
+###############################################################################################
+mkdir -p ~/.local/share/fonts
+for type in Bold Light Medium Regular Retina; do wget -O ~/.local/share/fonts/FiraCode-$type.ttf "https://github.com/tonsky/FiraCode/blob/master/distr/ttf/FiraCode-$type.ttf?raw=true"; done
+fc-cache -f
+
+###############################################################################################
+click droit sur horloge en bas à droite 
+tableau de bord
+préférences du tableau de bord
+éléments
+dbl click sur horloge
+changer UTC-+ truc
+
+check l'heure 
+timedatectl status
+
+###############################################################################################
+see https://classicforum.manjaro.org/index.php?topic=2263.0
+
+is Ntp installed?   network time protocol?
+
+install it then... look in terminal at systemd after install.. sudo systemctl list-unit-files | grep ntp
+
+if you see disable   probably it called Ntpd , sudo systemctl enable ntpd or ntp.d ,
+
+
+###############################################################################################
+
+https://phoenixnap.com/kb/change-bash-prompt-linux
+
+PS1="\e[0;31m[\e[1;31m\t\e[1;33m] \e[1;32m\u\e[1;36m·{\$ \W}\e[1;34m> \e[0m"
+good version:
+PS1="\[\e[0;31m\][\[\e[1;31m\]\t\[\e[1;33m]\] \[\e[1;32m\]]\u\[\e[1;36m\]·{\$ \W}\[\e[1;34m\]> \[\e[0m\]"
+cf https://www.linuxquestions.org/questions/linux-newbie-8/problem-linux-command-line-overwrites-itself-on-long-commands-914127/
+
+###############################################################################################
+package:
+ranger
+###############################################################################################
+to use awesome
+install xterm
+https://unix.stackexchange.com/questions/52087/clear-xfce4-session
+rm -fr ~/.cache/sessions/*
+https://wiki.archlinux.org/index.php/Xfce#Disable_saved_sessions
+https://wiki.archlinux.org/index.php/Xfce#Use_a_different_window_manager
+
+récupérer le wallpaper que j'aime de manjaro
+cp usr/share/backgrounds/manjaro-wallpapers-18.0/manjaro-cat.jpg ~/Documents/
+###############################################################################################
+
+** regexp memo
+
+grep [options, see after] filename
+or
+some commands | grep [options]
+
+p is the pattern we search
+^p line start with
+p$ line end with
+*p appears 0 or more time in line
+
+wider tools:
+. match any character
+[] range of character
+
+[^p] negates the occurence of the pattern
+<p> actual word finding
+
+in ls -l
+files start with -
+directories with d
+
+ls -l | grep ^-
+shows the files
+ls -l | grep ^d
+shows the directories
+** copy file
+rsync --progress 
+** fuzzy finder
+tired of remembering stuff? use fzf
+** getpath
+get a file path in the clipboard
+** X keyboard layout
+** space used
+   df
+   du
+
+   examples:
+   du -h -s *
+   to get a summary inside working directory
+
+* Things done
+** things installed
+   - fzf
+   - termite
+   - xclip
+   - awesome
+   - Hack Nerd Font (not via pacckage manager)
+   - xbindkeys
+   - polybar to customiwe status bar [[https://www.youtube.com/watch?v=ibRa4A4pIws&t=343s][how to use awesome wm and polybar]]
+   - dmenu to have a simple customizable popable menu
+   - kmix sound manager
+   - tldr simplified man page (pip install tldr)
+      
+** polybar + awesome
+    delete things linked to default awesome status bar (see wibar and
+    [[https://www.youtube.com/watch?v=ibRa4A4pIws&t=343s][yt_help_video]] or )
+
+    and do a launch.sh in ~/.config/polybar/ with:
+
+    #+begin_bash
+#!/bin/bash
+
+killall -q polybar
+while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
+polybar makc &
+
+if type "xrandr"; then
+  for m in $(xrandr --query | grep " connected" | cut -d" " -f1); do
+    MONITOR=$m polybar --reload makc &
+  done
+else
+  polybar --reload makc &
+fi
+    #+end_bash
+
+and in your rc.lua
+#+begin_lua
+awful.spawn.with_shell("/home/makc/.config/polybar/launch.sh")
+#+end_lua
+
+if you want to use kmix and data manager:
+(install kmix and network-manager-applet)
+
+#+begin_lua
+awful.spawn.with_shell("kmix")
+awful.spawn.with_shell("nm-applet")
+#+end_lua
+
+** important dotfiles
+.bashrc
+
+** things done
+*** awesome wallpaper
+    https://wiki.archlinux.org/title/Awesome#Theming
+    done the things said here to change wallpaper
+
+
+*** keyrate
+xset r rate 220
+in command line, pretty good
+* use awk to handle data (see code)
+
+* splitting file delimiter
+here the delimiter is -|
+#+begin_src bash
+csplit --digits=2  --quiet --prefix=outfile infile "/-|/+1" "{*}"
+# and maybe this too
+awk '{f="file" NR; print $0 " end"> f}' RS='-\\|'  input-file
+awk '{f="recette" NR; print $0 "fin de la recette (détectée à Source)"> f}' RS='Source'  input-file
+#+end_src
+
+Explanation (edited):
+
+RS is the record separator, and this solution uses a gnu awk extension
+which allows it to be more than one character. NR is the record
+number.
+
+The print statement prints a record followed by " -|" into a file that
+contains the record number in its name.
+
+* search into recipes
+
+#+begin_src bash
+read search_string
+cat $(rg -il $search_string | fzf)
+#+end_src

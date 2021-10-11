@@ -1,0 +1,151 @@
+
+ [[https://webtuu.com/blog/04/a-laymans-introduction-to-git][source]]
+ [[https://git-scm.com/book/en/v2][another_good_source]]
+* profile
+git config --global user.name "Your Name Here"
+git config --global user.email your@email.com
+
+* project
+** start
+# starts your git repository in /path/to/project
+cd /path/to/project
+git init
+** commiting changes
+*** general idea
+ when committing, you need to add files to a stage, then commit.
+
+ files/things in directory
+         |
+         |   git add
+         v
+   files are added on stage
+         |
+         |   git commit
+         v
+  changes stored/applied in your directory
+
+*** disclaimer
+Remember, anything that is committed in Git can almost always be
+recovered. Even commits that were on branches that were deleted or
+commits that were overwritten with an --amend commit can be recovered
+(see Data Recovery for data recovery). However, anything you lose that
+was never committed is likely never to be seen again.  
+
+*** standard stuff
+# add a file to track (to the 'stage')
+git add file1 file2 
+# add everything in the folder
+git add .
+# commiting with a simple message
+git commit -m "message"
+# if you want to modify the message in you editor
+# the -a tells git to commit all modified/deleted tracked files
+git commit -a 
+*** correcting last commit
+If you did a commit but fucked up something (you forgot to put
+something in the log message, or to put a modification...)
+You can modify the last commit with 
+=git commit --amend=
+the changes you make between your fucked up commit and your next will
+be merged, overwritting the last commit (if you don't put -m to put a
+message on the cli, you'll get your last message in your editor in
+case you want to modify it put not overwrite it all)
+
+example:
+$ git commit -m 'Initial commit'
+$ git add forgotten_file
+$ git commit --amend
+
+You end up with a single commit — the second commit replaces the results of the first.
+
+Only amend commits that are still local and have not been pushed
+somewhere. Amending previously pushed commits and force pushing the
+branch will cause problems for your collaborators. For more on what
+happens when you do this and how to recover if you’re on the receiving
+end read The Perils of Rebasing.  
+
+*** managing the stage
+**** remove from stage
+# Unstaging a Staged File with git restore
+git restore --staged file_to_unstage
+
+*** discard/unmodify changes since last commit
+If you don't like you modifications, you can undo them for a
+particular file, to revert its state to the last commit state.
+*BE CAREFUL THOUGH, YOU CAN'T GET THESE CHANGES BACK*
+
+# Unmodifying a Modified File with git restore
+git restore file_to_undo_changes
+
+** checking the project
+# check status of project
+git status
+# seeing the history of changes
+git log
+# check unstaged changes from last commit
+git diff
+
+** branches
+*** intuition
+you can have branches, switch between them, and modify them
+inpedendently!
+
+let's say this is your project "time line"
+
+                   cooler but less formal idea
+                 -------------------->
+  first idea    /  more formal idea
+---------------*--------------------->
+
+
+And if you want to merge them later, you can!
+
+      cooler but less formal idea
+-----------------------
+  more formal idea     \  finally let's have the cooler idea
+------------------------*--------------------->
+
+you have a "main" branch (called master in the past I think), the
+trunk, from where other branchers go, but you can have many branches:
+
+
+                           small variation 1
+           ----------------------------------------->
+  main    /                main
+---------*-----------*------------------------------>
+                      \    small variation 2
+                       ----------------------------->
+*** manage branches
+**** conventions
+naming conventions when working in groups:
+InitialsSix_Digits_birthdate/Name
+so if you are Marc Zoulala, born in 17 january 1994, and you want to
+create something to fix bug number 88, you put:
+mz170194/bugfix88
+**** commands
+# create a branch from a copy of the branch you are currently in
+git checkout -b your_branch_name
+# look at branches locally available, and shows your location
+git branch
+# merging into main if you're working solo
+git checkout main
+git merge your_branch_name 
+# merging into main on github
+# first go in the branch you want to merge
+git checkout your_branch_name 
+# then "push" your modifications
+git push -u origin your_branch_name 
+* remote repositories
+to add a reference point (an online repo you will use a lot)
+for instance
+#+begin_src
+git remote add ref_name git@github.com:webtuu/git_basics.git
+#+end_src
+
+When you do that, you add "ref_name", the name pointing to the
+original project repository. You can only read from this remote.
+
+It also adds "origin", pointing to your remote branch where your fork
+lives. You can read and write stuff to this remote.
+
+

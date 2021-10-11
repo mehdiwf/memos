@@ -1,0 +1,1572 @@
+Here is some help in various subjects, revolving around workflow on a
+computer.
+
+But most importantly, some emacs help tricks: use =C-h= b to search key
+bindings And =C-h m= to check the tools of the mode you're in. =C-x C-h:=
+get the list of emacs shortcuts =C-c C-h=: get the list of emacs
+shortcuts considering the mode you are currently using (e.g., C, Lisp,
+org, ...)
+
+* My notations
+** commentaries in most files
+#$*-lkr-26/05/2021
+#$*- commentaire
+
+** tags
+things useful for science: :sci:
+
+
+* Emacs vanilla
+** Useful bindings
+=C-x r k= 
+to kill rectangle selected
+** Vanilla emacs things
+*** Keybindings 
+**** Bookmarks
+  'C-x r m' when in an opened file, saves it as bookmark
+  'C-x r l' goto bookmark list
+  'M-x bookmark-delete' to delete 
+**** Help
+  'C-h m' or 'M-x describe-mode' to get all bindings
+  'C-h v or f' to describe variable or function
+  'C-h b' shows all bindings
+  'C-h c' describe a key
+***** More on bindings
+  If you want to see only the key bindings provided by a mode's own
+  keymap, then use library help-fns+.el and hit C-h M-k. You are
+  prompted for the keymap variable (e.g. dired-mode-map).
+
+**** Search 
+  C-s or C-r to search
+  C-x C-x to return to previous cursor point
+**** Dired
+ see : [[https://www.youtube.com/watch?v=5dlydii7tAU][yt video tutorial]]
+
+ - =C-x d=  open dired
+ - =R= rename and moves in destination if different (same as cut paste)
+ - =n= next item
+ - =p= previous item
+ - =C= copy item
+ - =d= marks for deletion
+ - =u= unmarks
+ - =U= unmarks all
+ - =t= reverse markings
+ - =D= delete it now (asks before)
+ - =x= confirm deletion
+ - =+= create a directory
+ - =^= go in previous directory
+ - =g= refresh buffer
+ - =% m= regexp
+ - =C-x C-q= make buffer writtable, enable to make dired editable as a normal file
+
+*** Keybindings explanation
+  see [[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][mastering key bindings in emacs]]
+**** tl;dr
+  Each key you press is linked (by a keymap) to a function that does something, which
+  means that you can customize everything if you can customize keymaps.
+**** Bases
+***** Keymap  
+  Keymaps are data structures used to store links between keys and
+  actions.
+  They are rarely modified directly, you generally use functions to do
+  so.
+  Every buffer has a keymap, as most major and minor modes.
+  Keys can be either:
+  - undefined
+    does nothing
+  - prefix key
+    like C-c or C-x
+  - complete key
+    bound to an action
+***** Key bind commands
+
+  - (define-key KEYMAP KEY DEF)
+      Defines a key against a keyboard map. Use this if you want to
+    change a keymap that isn’t the current buffer map.
+
+  - (local-set-key KEY COMMAND)
+      Binds a key to the local keymap used by the active buffer, unlike
+    define-key which takes an explicit keymap to bind a key against.
+
+  - (global-set-key KEY COMMAND)
+      Binds a key to the global keymap, making it available in all
+    buffers (with a caveat – see below.)
+
+  - (global-unset-key KEY)
+      Removes KEY from the global keymap
+  - (local-unset-key KEY)
+      Removes KEY from the active, local keymap.
+
+  to represent a key to emacs, we will generally use =kbd= which translate
+  a human readable key to something usable by emacs.
+
+  functions and navigation keys MUST be surrounded by < and >
+  (keys like <f1> <f2> <f3> or <home> or <down>...
+  but to represent =C-c p= you can write =(kbd "C-c p")=.
+
+***** Remapping commands 
+  =(define-key (current-global-map) [remap kill-line] 'my-homemade-kill-line)=
+ 
+  Here I globally remap all key binds that point to kill-line to
+  my-homemade-kill-line.
+
+***** Reserved keys
+  =C-c ?= with l any letter is generally reserved to the user
+  (but be careful, some third-party packages don't give a damn)
+
+  also =f5= and onwards, and /hyper/super/ (very old keys, so some people
+  use window key instead for instance)
+  /hyper/ : =H-=
+  /super/ : =s-=
+****** to enable h and s in windows
+  (setq w32-apps-modifier 'hyper)
+  (setq w32-lwindow-modifier 'super)
+  (setq w32-rwindow-modifier 'hyper)
+  and in X use /xmodmap/
+
+***** Keymap lookup order
+****** Keymap list
+      There is a priority in bindings in emacs.
+  Only /ACTIVE/ keymaps are used
+
+  - overriding-terminal-local-map
+    for terminal-specific key binds.
+
+  - overriding-local-map
+    for keys that should override all other local keymaps. Be VERY
+    careful if you use this!
+  
+  - Keymap char property at point for keymaps that are local to the
+    character point is at. This is used for stuff like fields in
+    yasnippet and the customize dialog.
+  
+  - emulation-mode-map-alists
+    for advanced multi-mode keymap management
+
+  - minor-mode-overriding-map-alist
+    for overriding the keymaps used by minor modes in major modes.
+
+  - minor-mode-map-alist
+    is exactly like the overriding version above, but the preferred
+    means of specifying the keymaps for minor modes.
+  
+  - Keymap text property at point is like the one above for char
+    properties but is for text properties only.
+  
+  - current-local-map
+    for keymaps defined in the buffers’ current local map
+
+  - current-global-map
+    is the last place Emacs will look for key binds and it is for the
+    global ones.
+
+****** Important note
+     
+  What is important is that minor mode keys come before local keys,
+  which are before global keys.
+
+***** Global vs local
+  Global keys and local keys are in practice identical, except global
+  keys are declared in a global keymap governed by the =current-global-map=
+  function. 
+  Generally it points to the default =global-map= variable.
+
+  We could use =define-key= with =current-global-map=, but the better
+  alternative is to use the function created for that, =global-set-key=.
+  Similarly, using =local-set-key= instead of =define-key=.
+  Like the global side, we also have =current-local-map= returning the
+  keymap local to the buffer.
+
+****** Important note
+  It’s important that you know that although the major mode in a buffer
+  will define the bulk of the key binds used in a buffer, the minor
+  modes often add, remove or change the key binds as they take
+  precedence over the local keymap.
+**** Practically?
+***** Defining your command
+****** How is a command invoked?
+       Commands, or rather interactive functions (intended to be used by
+       users) are the only functions callable by a keybinding. It also needs
+       to be a function without parameters (or using a lambda function or
+       =defun=)
+       Prepared templates can be used (see after)
+****** Describing a command
+  You can either use the manual (=C-h k KEY= or =C-h f FUNCTION=)
+  A smart way:
+  Or use =repeat-complex-command=, bound to =C-x ESC ESC=.
+  It asks to redo the last typed command, and show the code to execute.
+  Which can be changed and used in your own code.
+
+  With this, you can do a complex command:
+  And have everything filled for you (cf after)
+******* example 
+    -- C-M-% foo RET bar RET – which does a query-replace-regexp replacing
+    foo with bar
+
+    it appears:
+
+    (query-replace-regexp "foo" "bar" nil
+       (if (and transient-mark-mode mark-active)
+	   (region-beginning))
+       (if (and transient-mark-mode mark-active)
+	   (region-end)))
+***** Modes
+      Most major and minor modes will set their key once, once loaded.
+      Thus, we can use =define-key= to add key definitions into their
+      modemap.
+
+      If the mode has many maps, you may have to look tho source code
+      or the info manual to find out how to add keys.
+
+  But when the mode is using a mode hook, you must set your keys when the
+  mode is launched, using its mode hook which is a little bit more
+  schloux.
+
+***** CONVENTIONS
+  Every major mode functions activating the mode end in =-mode=. And mode
+  maps end in =-xxx-mode-map=, and its major mode hook in =-xxx-mode-hook=.
+
+***** How to change a specific keymap
+  You can change a keymap with =define-key=, but seeing WHICH keymap you
+  modify isn't direct.
+****** Listing all mode maps
+  =C-u M-x apropos-variable RET -mode-map$ RET=
+  will give you all the mode maps following the major mode naming scheme
+  put above.
+
+***** Hooks
+  A mode hook has 0 or more functions that are called when the mode is
+  activated.
+  It can be added with =add-hook= that takes the name of a hook
+  (e.g. =python-mode-hook=) and the name of a function to call.
+****** Listing all hooks
+  =C-u M-x apropos-variable RET -mode-hook$ RET=
+
+****** Quick hook example
+
+  #+begin_src emacs-lisp 
+  (defun mp-add-python-keys ()
+    (local-set-key (kbd "C-c q") 'shell))
+
+  (add-hook 'python-mode-hook 'mp-add-python-keys)
+  #+end_src
+**** Templates
+
+  Here’s a bunch of templates for various use-cases that you can
+  cut’n’paste and use in your own code. I recommend naming things
+  sensibly, and giving them a docstring (in-code documentation that
+  explains what the code does) as well. The best way to avoid
+  accidentally overriding another function with the same name, I would
+  suggest you use a moniker or prefix (I use mp-.)
+
+
+  I suggest you read my article, Evaluating Elisp in Emacs, to learn how
+  to evaluate and test the code you write!
+
+***** Function Template
+  Purpose
+
+  Required if you want to invoke non-interactive functions or
+  functions/commands with parameters. Use this functions’ name in the
+  command definition argument.
+
+  Definition
+
+  (defun my-function-name-here ()
+    (interactive)
+    ;;; Place your code below this line, but inside the bracket.
+    )
+
+  Example
+
+  Displays the message “Hello, World” in the echo area when invoked.
+
+  (defun mp-display-message ()
+    (interactive)
+    ;;; Place your code below this line, but inside the bracket.
+    (message "Hello, World")
+    )
+
+***** Basic Global Key Bind
+  Purpose
+
+  Creates a global key bind available to all buffers.
+  Definition
+
+  (global-set-key (kbd "key-bind-here") 'interactive-command-here)
+
+  Example
+
+  Binds F1 to M-x shell
+
+  (global-set-key (kbd "<f1>") 'shell)
+
+***** Add key definition to a keymap
+  Purpose
+
+  Adds a key and its associated command to a local keymap. Useful for
+  extending major modes with your own custom key binds.
+
+  Definition
+
+  (define-key KEYMAP (kbd "key-bind-here") 'interactive-command-here)
+
+  Example
+
+  Binds C-c p to python-switch-to-python
+
+  (define-key python-mode-map (kbd "C-c p") 'python-switch-to-python)
+
+***** Complex Command Key Bind
+  Purpose
+
+  Creates a global key bind that invokes multiple commands in a row. Use
+  this to create compound keys or invoke commands that take
+  parameters. Uses code from the Function Template.
+
+  Definition
+
+  (defun name-of-interactive-command-here ()
+    (interactive)
+    ;;; Insert your compound commands below
+
+    )
+  (global-set-key (kbd "key-bind-here") 'name-of-interactive-command-here)
+
+  Example
+
+  Switches to the *scratch* buffer and inserts “Hello, World” where point
+  is, and switches back to where it came from.
+
+
+  (defun switch-to-scratch-and-insert-text ()
+    (interactive)
+    (save-excursion
+      (set-buffer "*scratch*")
+      (insert "Hello, World")))
+  (global-set-key (kbd "C-c i") 'switch-to-scratch-and-insert-text)
+
+***** Binding keys with a mode hook
+  Purpose
+
+  Use this mode hook template to bind keys that won’t work with a
+  standard define-key template or that require local binding for other
+  reasons. The advantage of a mode hook is that it also gives you the
+  opportunity to set mode-specific settings like indentation, etc.
+
+  Definition
+
+  (defun my-hook-function ()
+    ;; add your code here. it will be called every
+    ;; time the major mode is run.
+
+    )
+  (add-hook 'my-mode-hook 'my-hook-function)
+
+  Example
+
+  Make the return key automatically indent on a newline in
+  emacs-lisp-mode, and enable eldoc mode as well.
+
+
+  (defun enable-my-elisp-settings ()
+    (turn-on-eldoc-mode)
+    (local-set-key (kbd "C-m") 'newline-and-indent))
+  (add-hook 'emacs-lisp-mode-hook 'enable-my-elisp-settings)
+
+***** Remapping a function
+  Purpose
+
+  This template will remap all keys that point to a specific function;
+  say you want to rebind kill-line which is bound to C-k but you want
+  your code to only override the key binds that kill-line is actually
+  bound to. Use this template to replace existing commands with those of
+  your own, without worrying about explicitly rebinding each key.
+
+  Definition
+
+  Note: to replace a global key, you must use global-map or call
+  current-global-map.
+
+
+  (define-key keymap [remap original-function] 'my-own-function)
+
+  Example
+
+  Example here is taken from my article on fixing the mark commands in
+  transient mark mode. I remap the keys that point to
+  exchange-point-and-mark to my own function
+  exchange-point-and-mark-no-activate.
+
+
+  (defun exchange-point-and-mark-no-activate ()
+    "Identical to \\[exchange-point-and-mark] but will not activate the region."
+    (interactive)
+    (exchange-point-and-mark)
+    (deactivate-mark nil))
+  (define-key global-map [remap exchange-point-and-mark] 'exchange-point-and-mark-no-activate)
+
+***** Custom Prefixes
+  Purpose
+
+  Creating a prefix is easy nowadays as you don’t have to explicitly
+  create your own prefix keymaps, provided you use local-set-key or
+  global-set-key. Use custom prefixes to group or categorize your
+  commands.
+
+  Definition
+
+  (global-set-key (kbd "subkey_1 ... endkey_1") 'my-command-1)
+  (global-set-key (kbd "subkey_1 ... endkey_2") 'my-command-2)
+
+  Example
+
+  Global keys that will insert either the time of the day, or the
+  current date. Type C-c i d to insert the date; and C-c i t to insert
+  the time. Type C-c i C-h to list all bound keys under the C-c i
+  prefix.
+
+
+  (defun mp-insert-date ()
+    (interactive)
+    (insert (format-time-string "%x")))
+
+  (defun mp-insert-time ()
+    (interactive)
+    (insert (format-time-string "%X")))
+
+  (global-set-key (kbd "C-c i d") 'mp-insert-date)
+  (global-set-key (kbd "C-c i t") 'mp-insert-time)
+
+**** Conclusion
+
+  I have covered almost every facet of key binding that most Emacs users
+  would care to know about. I know there’s a lot of tutorials out there
+  that essentially capture only what I have in the templates section,
+  but for your edification I decided I wanted to cover everything (or
+  near as well anyway) that make up a key definition.
+
+
+  That I can dedicate so much to a topic that on the outset appears
+  straightforward highlights the flexibility – and complexity – of
+  Emacs. I hope the guide has taught you how to do one of the most
+  frequently-asked things in Emacs.
+*** Seeing tabs in code or text
+ M-x whitespace-mode
+*** Automating with macros                                              :sci:
+**** Basics
+ C-x (
+ to begin to record a macro
+ C-x )
+ to end the recording
+ C-x e
+ to play a macro
+ C-x C-k n
+ to save a macro as an interactive command in emacs (callable with M-x)
+ REMINDER:
+ C-u n COMMAND
+ to repeat n times the command COMMAND ;)
+**** Examples
+add a space at the end of the last line in all files
+of a directory (~/.emacs.d/personal_MF/yasnippet/latex-mode/) and its
+subdirectories.
+
+steps:
+- go to emacs eshell
+- use the command: cd ~/.emacs.d/personal_MF/yasnippet/latex-mode/
+- then: find -type f
+- copy the list in scratch
+- modify the list in scratch: (with a simple macro)
+     initial format:
+         ./vector.txt
+     desired format:
+         ~/.emacs.d/personal_MF/yasnippet/latex-mode/vector.txt
+- make a macro that cuts the first line of scratch, search for the
+  file with =C-x C-f=, goes at the end of it =M->=, adds space, save =C-x
+  C-s=, kills buffer =C-x C-k= and then you return to scratch so it is repeatable.
+**** Recording macros
+Record a macro, then name it with =C-x C-k n=
+insert it in your init.el with =M-x insert-kbd-macro=
+and set a binding for it (for instance here, using general.el:)
+
+#+begin_src emacs-lisp 
+(fset 'lkr/org_export_latex
+   (kmacro-lambda-form [?\C-c ?\C-e ?l ?o ?y ?\C- ] 0 "%d"))
+
+ (general-define-key
+  "C-c x l" 'lkr/org_export_latex)
+#+end_src
+** python mode                                                          :sci:
+ C-c C-p to start a python shell
+ C-c C-c to execute your file
+ C-c C-r to execute region
+ C-c C-l to execute a file you're not editing
+ C-M-x python-shell-send-defun
+** emacs lisp
+*** quotes advice
+**** set
+     (set 'flowers '(rose violet daisy buttercup))
+
+   Note also, that when you use ‘set’, you need to quote both arguments
+to ‘set’, unless you want them evaluated.  Since we do not want either
+argument evaluated, neither the variable ‘flowers’ nor the list ‘(rose
+violet daisy buttercup)’, both are quoted.  (When you use ‘set’ without
+quoting its first argument, the first argument is evaluated before
+anything else is done.  If you did this and ‘flowers’ did not have a
+value already, you would get an error message that the ‘Symbol's value
+as variable is void’; on the other hand, if ‘flowers’ did return a value
+after it was evaluated, the ‘set’ would attempt to set the value that
+was returned.  There are situations where this is the right thing for
+the function to do; but such situations are rare.)
+**** setq
+     (setq carnivores '(lion tiger leopard))
+
+(The ‘q’ in ‘setq’ means ‘quote’.)
+As a practical matter, you almost always quote the first argument to
+‘set’.  The combination of ‘set’ and a quoted first argument is so
+common that it has its own name: the special form ‘setq’.  This special
+form is just like ‘set’ except that the first argument is quoted
+automatically, so you don’t need to type the quote mark yourself.  Also,
+as an added convenience, ‘setq’ permits you to set several different
+variables to different values, all in one expression.
+
+     (setq trees '(pine fir oak maple)
+           herbivores '(gazelle antelope zebra))
+
+* Org-mode
+** Structures
+*** Sparse trees
+    C-c / : to search in trees
+*** Plain lists 
+    Lists can "provide additional structure"
+    You can create unordered or ordered lists, and "description" lists
+    TAB : items can be folded like headlines
+    M-Ret : insert new item at current level. With a prefix argument, force a new heading
+    M-S-Ret : insert a new item with a checkbox
+   
+    put [/] [%]  next to todo if you have checkboxs and want to have the
+    ratio or percentage done
+   
+    M-S-Up or DOWN : move the item including subitems up/down
+    M-Left or Right : indentation of an item without subitems
+    M-S-Left or Right : indentation of an item with subitems
+    C-c C-c : toggle state of checkbox, also verify bullets and indentation consistency in the whole list
+    C-c - : Cycle the entire list level through the different itemize/enumerate bullets
+*** Tables
+     It comes with Emacs Calc package.
+ You can do:
+ |1|2|3|
+ |-
+
+ then press tab just after - to complete
+ or just the first row and then C-c Ret
+
+ TAB moves to the next field
+ Ret movest to the next row
+ C-c C-c to realign
+    
+ | name  | age | swag |
+ |-------+-----+------|
+ | marc  | ?   | +    |
+ | mehdi |     |      |
+
+ C-c | : Convert the active region to table. If every line contains at
+ least one TAB character, the function assumes that the material is tab
+ separated. If every line contains a comma, comma-separated values
+ (CSV) are assumed. If not, lines are split at whitespace into
+ fields. If there is no active region, this command creates an empty
+ Org table. But it is easier just to start typing, like
+  | N a m e | P ho n e | A g e RET | - TAB.
+
+***** Important commands 
+****** Field motion
+
+      C-c C-c realign
+      TAB move to next field
+      S-TAB previous field
+      Ret
+      S-arrow keys
+     
+****** Column and row editing
+      col = column
+      M-Left or Right : move col 
+      M-S-Left : kill col
+      M-S-Right : insert col
+      M-
+
+** Keybindings
+*** Headings
+    - C-c C-n next heading
+    - C-c C-p previous heading
+
+   C-c C-*
+   if * = n : next heading 
+          p : previous heading
+	  f : next heading same level
+	  b : previous heading same level
+	  u : backward to higher level heading
+
+*** Properties
+   - add property : C-c C-x p 
+   - del property : C-c C-c d
+
+*** Links
+   - store link : C-c l
+   - create link : C-c C-l
+
+*** Todos/Tags
+   - create/cycle todos states : C-c C-t
+   - create tag : C-c C-q if in the heading C-c C-c if on the headline
+     name
+
+*** Lists
+    - Tab to contract/expand like headers
+    - M-Ret to create new entry
+    - M-S-Ret create entry with box
+    - M-S-up/down move an item with its components
+    - M-left/right change indentation without comp
+    - M-S-left/right change indentation without comp
+    - C-c C-c modify the box state and refresh the list
+    - C-c -/:   ??
+
+*** Captures
+    - C-c c to capture (custom) 
+
+*** Templates
+ - C-c C-,  
+
+*** Old notes
+
+  M-Ret : insert new heading at same level or new item in list
+  M-S-Ret : insert new todo entry with same level as current heading
+  TAB in new empty heading entry : cycle through reasonable levels
+  M-left or right : promote or demote current heading
+  M-up or down : move subtree upe or down
+  C-c C-w : refile entry or region to a different location.
+  C-x n s or w : Narrow buffer to current subtree and widen again
+** Code
+*** Inline code
+
+ =this is src_python[test]{return(2+2)} the test=
+ is exported in latex as:
+ =this is \texttt{4} the test=
+
+ this is src_python[test]{return(2+2)} {{{results(=4=)}}} the test
+ does the same
+*** code blocks
+options if needed:
+:exports none :results silent 
+** Writing nice documents easily
+*** Tables                                                        :Louna:sci:
+**** manipulation
+***** Create
+  - to start a table with column titles, write
+  | title 1 | title 2 | title 3 |
+  |- 
+   then press TAB, the table will create automatically
+   Rq: | is AltGr + b
+  - OR 
+  | title 1 | title 2 | title 3
+   then press C-c RET
+  - new horizontal separator: |- then TAB
+  - C-c |: convert an active region to table, using TAB or , as
+    separator if every line contains one such separator, else SPC
+***** Navigate and re-align
+  with TAB and RET. will automatically re-align
+  - C-c C-c: re-align without moving point
+  - TAB: re-align and move to the next field, creates a row if
+    necessary
+  - S-TAB: re-align and move to previous field
+  - RET: re-align and moves to the next row
+  - S-<up>,S-<down>, S-<left>, S-<right>: move a cell up, down, left,
+    right by swapping with adjacent cell.
+***** Column and row editing
+  - M-<right>, M-<left>: moves the column right or left
+  - M-S-<left>: kills the current column
+  - M-S-<right>: inserts a new column to the left of point position
+  - M-<up>, M-<down>: move current row up or down
+  - M-S-<up>: kill the current row or horizontal line
+  - M-S-<down>: insert a new row below current row
+  - C-c -: Insert a horizontal line below current row
+  - C-c RET: Insert a horizontal line below current row, move the
+    point into the row below that line
+  - C-c ^: sort the table lines in the region. The position of point
+    indicates the column to be used for sorting, and the range of lines
+    is the range between the nearest horizontal separator lines, or the
+    entire table
+
+***** Managing tables
+  C-c - to get the line separating names and values
+  | a | b |
+  |---+---|
+  | 1 | 2 |
+  tab or S-tab to navigate
+**** exporting table
+***** in latex
+  Highlight the table you want to export and C-c C-e C-b l L
+  to get the LateX code
+
+ you can even put attributes:
+
+ #+begin_example
+
+  #+attr_latex: :placement [H] :align | c | l |
+  #+caption: A simple table
+  #+tblname: tab:example
+  |----------+----------|
+  | heading1 | heading2 |
+  |----------+----------|
+  |        1 |        8 |
+  |        4 |        5 |
+  |----------|----------|
+
+ #+end_example
+
+**** importing data tables
+ for file.tab
+ M-x org-table-import
+ (possible to do it with a lisp code block)
+**** using data in code
+
+  #+NAME: dat
+  | a | b |
+  |---+---|
+  | 9 | 3 |
+  | 8 | 2 |
+
+  #+begin_src python :var data=dat
+  n = len(data)
+  a = data[0]
+  return("this is {} and {}".format(a[0],a[1]))
+  #+end_src
+
+  #+RESULTS:
+  : this is 9 and 3
+*** Maths
+
+ $\frac{a}{b}$ 
+ mark the area to preview and C-c C-x C-l to toggle the preview
+ y^2 \alpha 
+ org-toggle-pretty-entities 
+ C-c C-x C-S-l to toggle the preview (personal)
+*** Images
+[[https://orgmode.org/manual/Images.html][Org manual Images]]
+
+#+begin_example
+[[file:path_to_image.png]]
+#+end_example
+You can toggle the preview with =M-x org-toggle-inline-images= or =C-c
+C-x C-v=
+*** Latex integration                                                   :sci:
+[[https://kitchingroup.cheme.cmu.edu/blog/2014/08/08/What-we-are-using-org-mode-for/][Kitchin group page about use of orgmode]]
+**** Basic options
+ C-c C-e
+ and then # insert template, then select latex
+ to get basic options you can set for your document
+
+if you want to insert one manually, you can insert =#+= and then press
+=M-TAB= or =C-M-i= for a completion window.
+**** Beamer options
+***** options set
+ #+begin_example
+
+ #+TITLE: LaTeX Beamer presentation
+ #+DATE: \today
+ #+AUTHOR: Sachin Patil
+ #+EMAIL: psachin@redhat.com
+ #+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+ #+OPTIONS: author:t c:nil creator:comment d:(not "LOGBOOK") date:t
+ #+OPTIONS: e:t email:nil f:t inline:t num:t p:nil pri:nil stat:t
+ #+OPTIONS: tags:t tasks:t tex:t timestamp:t toc:nil todo:t |:t
+ #+CREATOR: Emacs 25.3.1 (Org mode 8.2.10)
+ #+DESCRIPTION:
+ #+EXCLUDE_TAGS: noexport
+ #+KEYWORDS:
+ #+LANGUAGE: en
+ #+SELECT_TAGS: export
+ #+LATEX_CLASS: beamer
+ #+BEAMER_THEME: Frankfurt
+ #+BEAMER_INNER_THEME: rounded
+ #+end_example
+***** important lines
+ the important modifications from classic latex export is
+ #+begin_example
+ #+LATEX_CLASS: beamer
+ #+BEAMER_THEME: Frankfurt
+ #+BEAMER_INNER_THEME: rounded
+ #+end_example
+
+***** export
+ then: but C-c C-e should work I think,
+ _because I don't find this function_
+ org-beamer-export-to-pdf
+**** Default packages and options
+for example:
+#+begin_src emacs-lisp 
+(setq org-latex-packages-alist '(("margin=2cm" "geometry" nil)))
+#+end_src
+
+**** Latex snippets
+[[https://orgmode.org/manual/Previewing-LaTeX-fragments.html#Previewing-LaTeX-fragments][Org manual Latex fragment]]
+
+export blocks with C-c C-, l
+#+BEGIN_EXPORT latex
+\setlength{\unitlength}{1cm}
+\thicklines
+\begin{picture}(10,6)
+\put(2,2.2){\line(1,0){6}}
+\put(2,2.2){\circle{2}}
+\put(6,2.2){\oval(4,2)[r]}
+\end{picture}
+#+END_EXPORT
+**** Bibliography
+[[https://github.com/jkitchin/org-ref][Org-ref package github]]
+
+**** Manual
+ [[https://orgmode.org/manual/Export-Settings.html][Org manual Export options]]
+ [[https://orgmode.org/manual/Markup-for-Rich-Contents.html#Markup-for-Rich-Contents][Org manual text formatting using markdown]]
+ 
+*** Journal templates
+ [[https://emacs.stackexchange.com/questions/46017/is-there-a-way-to-export-latex-template-to-scimax-template][Step by step procedure (check response)]]
+
+**** pasted response (not sure if formatted correctly)
+ Summary
+
+ This How-To tutorial provides a step by step guide on how to migrate the LaTeX template provided by an academic journal into org-mode syntax.
+ Instructions
+
+ To complete this tutorial successfully, please follow all steps in the order presented of each section listed below:
+
+     Requirements
+     Create New org-mode File
+     Download LaTeX Template
+     Migrate LaTeX Template Code into file variables
+     Migrate LaTeX Template Code into SRC blocks
+     Customize a SRC block using Literate Programming
+     Add Content to org-mode File
+     Export completed org-mode file as PDF
+
+ Requirements
+
+     Note: All the requirements must be completed successfully before continuing with the steps in this How-To tutorial.
+
+ Instructions
+
+     Download, Install, and Configure LaTeX Software
+
+     Unfortunately, this requirement is beyond the scope of this How-To tutorial.
+
+     Download, Install, and Configure emacs Software
+
+     Unfortunately, this requirement is beyond the scope of this How-To tutorial.
+
+     Download, Install, and Configure org-mode Software
+
+         Note: The org-mode application is already installed if you are using a recent version of emacs, i.e. versions 25 or greater.
+
+     Unfortunately, this requirement is beyond the scope of this How-To tutorial.
+
+     Export an org-mode file as PDF via built-in LaTeX exporter.
+
+         TIP: To export an org-mode document to PDF:
+             Open the org-mode file in emacs.
+             Position the cursor in the buffer of the org-mode document in emacs.
+             Press the following key chords and keys, C-c C-e l p to initiate the export process.
+             Open the exported PDF file to validate the export process succeeded.
+
+     If exporting an org-mode file to PDF succeeded then continue following the steps in this How-To tutorial. Otherwise troubleshoot each step in the requirements section and repeat until exporting an org-mode document to PDF is successful.
+
+ Create New org-mode File
+ Instructions
+
+     Create a new org-mode file using emacs.
+
+     For this tutorial, the filename will be journal-template.org
+         To create the file in emacs do the following:
+             Press the key chords C-x C-f
+             Type journal-template.org
+             Press Return or Enter key
+
+     Add mode line to top of the file.
+
+     # -*- mode: org; org-confirm-babel-evaluate: nil; org-babel-noweb-wrap-start: "«"; org-babel-noweb-wrap-end: "»"; -*-
+
+         TIP: To insert « press key chord C-x 8 < and to insert » press key chord C-x 8 >
+
+     Add Template Utility Code Section to end of file.
+
+     * Template Utility Code                                            :noexport:
+
+     Add Common Export Settings Section to end of the file.
+
+     * Common Export Settings                                           :noexport:
+
+     #+OPTIONS: ':nil *:t -:t ::t <:nil H:4 \n:nil ^:{} arch:headline
+     #+OPTIONS: author:nil broken-links:nil c:nil creator:nil
+     #+OPTIONS: d:(not "LOGBOOK") date:nil e:t email:nil f:t inline:t num:nil
+     #+OPTIONS: p:nil pri:nil prop:t stat:nil tags:t tasks:nil tex:t
+     #+OPTIONS: timestamp:nil title:nil toc:nil todo:nil |:t
+     #+SELECT_TAGS: export
+     #+EXCLUDE_TAGS: noexport nolatex
+
+     # For Display when file is exported with org-ruby 
+
+     #+EXPORT_SELECT_TAGS: export
+     #+EXPORT_EXCLUDE_TAGS: noexport
+
+     Save the file in emacs.
+         To save the file in emacs do the following:
+             Press the key chords C-x C-s
+
+ Self Check - Example 1
+
+ After completing the instructions in this section, the contents of journal-template.org should be similar to self-check-example-01.org.
+ Download LaTeX Template
+
+ For this How-To tutorial, the LaTeX template1 provided by the European Physical Journal A (EPJ A)2 will be used.
+
+ The following 3 files provided by the EPJ A will be needed in this tutorial:
+
+     template.tex
+
+     The template.tex file is provided as "[a] fill-in-form for a standard article with usage comments"3.
+
+     The objective of this How-To tutorial is migrate LaTeX code from template.tex into the new org-mode file.
+
+     svepj.clo
+
+     The svepj.clo is the LaTeX "[c]lass option file for The European Physical Journal"4.
+
+     svjour.cls
+
+     The svjour.cls is the LaTeX "[c]ore document class file for Springer journals"5.
+
+ Instructions
+
+     Download template.tex file into same directory as journal-template.org.
+
+     Download svepj.clo file into same directory as journal-template.org.
+
+     Download svjour.cls file into same directory as journal-template.org.
+
+ Migrate LaTeX Template Code into file variables
+
+ In this section, the objective is migrate LaTeX code from LaTeX template into file varibles syntax at the bottom of the org-mode file. The file varibles will be used when exporting from org-mode back to LaTeX.
+
+ The LaTeX code that will be migrated into file variables syntax is located near the top of template.tex file:
+
+ %
+ \begin{filecontents}{leer.eps}
+ %!PS-Adobe-2.0 EPSF-2.0
+ %%CreationDate: Mon Jul 13 16:51:17 1992
+ %%DocumentFonts: (atend)
+ %%Pages: 0 1
+ %%BoundingBox: 72 31 601 342
+ %%EndComments
+
+ gsave
+ 72 31 moveto
+ 72 342 lineto
+ 601 342 lineto
+ 601 31 lineto
+ 72 31 lineto
+ showpage
+ grestore
+ %%Trailer
+ %%DocumentFonts: Helvetica
+ \end{filecontents}
+ %
+ \documentclass[epj]{svjour}
+
+     TIP: When migrating the LaTeX code into file variables, you will need to double the backslashes \, e.g. \end will become \\end.
+
+ Instructions
+
+     Add the following lines of file variables syntax to the end of the journal-template.org file.
+
+     # Local Variables:
+     # eval: (require (quote cl-lib))
+     # eval: (require (quote ox))
+     # eval: (require (quote ox-publish))
+     # org-latex-with-hyperref: nil
+     # eval: (add-to-list (quote org-latex-classes) (quote ("epj-svjour" "%%%%%%%%%%%%%%%%%%%%%%%% epj-svjour %%%%%%%%%%%%%%%%%%%%%%%%%%
+     # %
+     # \\begin{filecontents}{leer.eps}
+     # %!PS-Adobe-2.0 EPSF-2.0
+     # %%CreationDate: Mon Jul 13 16:51:17 1992
+     # %%DocumentFonts: (atend)
+     # %%Pages: 0 1
+     # %%BoundingBox: 72 31 601 342
+     # %%EndComments
+     # 
+     # gsave
+     # 72 31 moveto
+     # 72 342 lineto
+     # 601 342 lineto
+     # 601 31 lineto
+     # 72 31 lineto
+     # showpage
+     # grestore
+     # %%Trailer
+     # %%DocumentFonts: Helvetica
+     # \\end{filecontents}
+     # %
+     # \\documentclass[epj]{svjour}
+     #  [NO-DEFAULT-PACKAGES]
+     #  [PACKAGES]
+     #  [EXTRA]" ("\\section{%s}" . "\\section*{%s}") ("\\subsection{%s}" . "\\subsection*{%s}") ("\\subsubsection{%s}" . "\\subsubsection*{%s}") ("\\paragraph{%s}" . "\\paragraph*{%s}") ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+     # End:
+
+     Add the following line under the mode line near the top of the journal-template.org file.
+
+     #+LATEX_CLASS: epj-svjour
+
+ Self Check - Example 2
+
+ After completing the instructions in this section, the contents of journal-template.org should be similar to self-check-example-02.org.
+ Migrate LaTeX Template Code into SRC blocks
+
+ In this section, the object is to migrate specific snippets of LaTeX code from the LaTeX template into SRC block syntax provided by org-mode. Each SRC block will inject customized LaTeX into the final LaTeX document created by the built-in exporter.
+
+ These template specific SRC blocks will be kept under a dedicated section named Template Utility Code which will not be exported.
+ Instructions
+
+     Add the following lines after the * Template Utility Code section in the journal-template.org document.
+
+     ** export-epj-latex-block
+
+      #+NAME: export-epj-latex-block
+      #+BEGIN_SRC latex :noweb yes
+        %
+        \title{«get-title-text()»}
+        \subtitle{«get-subtitle-text()»}
+        \author{«epj-authors-latex()»% etc
+        % \thanks is optional - remove next line if not needed
+        \thanks{\emph{Present address:} Insert the address here if needed}%
+        }                     % Do not remove
+        %
+        \offprints{}          % Insert a name or remove this line
+        %
+        \institute{«epj-institutions-latex()»}
+        %
+        \date{Received: date / Revised version: date}
+        % The correct dates will be entered by Springer
+        %
+        \abstract{
+        «get-abstract-text()»
+        %
+        \PACS{
+        «epj-pacs-codes-latex()»
+         } % end of PACS codes
+        } %end of abstract
+        %
+        \maketitle
+      #+END_SRC
+
+     *** get-title-text
+
+      #+NAME: get-title-text
+      #+BEGIN_SRC elisp 
+        (format "%s" (car (plist-get (org-export-get-environment) ':title)))
+      #+END_SRC
+
+      #+RESULTS: get-title-text
+      : Title Goes Here
+
+     *** get-subtitle-text
+
+      #+NAME: get-subtitle-text
+      #+BEGIN_SRC elisp  :results replace :var keyword="subtitle" :var delimiter=" "
+       (mapconcat 'car (org-element-map
+            (org-element-parse-buffer)
+            '(keyword)
+          (lambda (x) (if (string= (upcase keyword) (org-element-property :key x))
+               (list (org-element-property :value x)) )
+            )
+          ) delimiter)
+      #+END_SRC
+
+      #+RESULTS: get-subtitle-text
+      : Subtitle Goes Here
+
+     *** get-abstract-text
+
+      #+NAME: get-abstract-text
+      #+BEGIN_SRC elisp :results replace :var keyword="abstract"
+        (org-element-map (org-element-map
+                 (org-element-parse-buffer)
+                 '(headline)
+                   (lambda (hl) (if (string= (upcase keyword) (upcase (org-element-property :raw-value hl)))
+                           hl)
+                 ) 
+                   nil t)
+            '(paragraph)
+          (lambda (p) 
+            (format "%s" (replace-regexp-in-string (rx (or (: bos (* (any " \t\n")))
+                                   (: (* (any " \t\n")) eos)))
+                               ""
+                      (buffer-substring-no-properties (org-element-property :contents-begin p) (org-element-property :contents-end p))))
+            )
+          nil t)
+      #+END_SRC
+
+      #+RESULTS: get-abstract-text
+      : The abstract goes here.
+
+     *** epj-pacs-codes-latex 
+
+      #+NAME: epj-pacs-codes-latex
+      #+BEGIN_SRC elisp  :var pacs_codes=pacs-codes-table :results latex replace :var join_delim="   \\and\n"
+        (mapconcat 'identity (mapcar (lambda (x) (format "      {%s}{%s}" (car x) (nth 1 x))) pacs_codes) join_delim)
+      #+END_SRC
+
+      #+RESULTS: epj-pacs-codes-latex
+      #+BEGIN_EXPORT latex
+            {PACS-key01}{Text Describing PACS-key01}   \and
+            {PACS-key02}{Text Describing PACS-key02}
+      #+END_EXPORT
+
+     *** epj-authors-latex 
+
+      #+NAME: epj-authors-latex
+      #+BEGIN_SRC elisp  :var authors=authors-table :results latex replace :var join_delim=" \\and "
+        (mapconcat 'identity (mapcar (lambda (x) (format "%s\\inst{%s}" (car x) (nth 2 x))) authors) join_delim)
+      #+END_SRC
+
+      #+RESULTS: epj-authors-latex
+      #+BEGIN_EXPORT latex
+      Mai Deah\inst{1} \and Arthur Secondus\inst{1} \and E. Tal\inst{2}
+      #+END_EXPORT
+
+     *** epj-institutions-latex 
+
+      #+NAME: epj-institutions-latex
+      #+BEGIN_SRC elisp  :var institutions=institutions-table :results latex replace :var join_delim=" \\and "
+        (mapconcat 'identity (mapcar (lambda (x) (format "%s" (nth 1 x))) institutions) join_delim)
+      #+END_SRC
+
+      #+RESULTS: epj-institutions-latex
+      #+BEGIN_EXPORT latex
+      New Discoveries Lab, Department of Something-or-Ruther, University of Some-Sort, Some-Sort, Some-Sort-of-Country \and Golden Opportunities Lab, Department of Obscure Studies, Ancient College, Olde-Locale, Stodgy-Land
+      #+END_EXPORT
+
+     Add the following lines before the * Template Utitily Code section in the journal-template.org document.
+
+     #+TITLE: Title Goes Here
+
+     #+SUBTITLE: Subtitle Goes Here
+
+     #+CALL: export-epj-latex-block()
+
+     * Authors                                                          :nolatex:
+
+     #+NAME: authors-table
+     | Author          | Email                | Institution-ID |
+     |-----------------+----------------------+----------------|
+     | Mai Deah        | mai.deah@example.edu |              1 |
+     | Arthur Secondus |                      |              1 |
+     | E. Tal          |                      |              2 |
+
+     * Institutions                                                     :nolatex:
+
+     #+NAME: institutions-table
+     | Institution-ID | Institution                                                                                                      |
+     |----------------+------------------------------------------------------------------------------------------------------------------|
+     |              1 | New Discoveries Lab, Department of Something-or-Ruther, University of Some-Sort, Some-Sort, Some-Sort-of-Country |
+     |              2 | Golden Opportunities Lab, Department of Obscure Studies, Ancient College, Olde-Locale, Stodgy-Land               |
+
+     * PACS                                                             :nolatex:
+
+     #+NAME: pacs-codes-table
+     | PACS-KEY   | PACS-KEY-Description-Text  |
+     |------------+----------------------------|
+     | PACS-key01 | Text Describing PACS-key01 |
+     | PACS-key02 | Text Describing PACS-key02 |
+
+     * Abstract                                                         :nolatex:
+
+     # The abstract goes here.
+
+ Self Check - Example 3
+
+ After completing the instructions in this section, the contents of journal-template.org should be similar to self-check-example-03.org.
+ Add Content to org-mode File
+
+ In this section, several new placeholder sections will added. The content of each section will be Lorem Ipsum
+ Instructions
+
+     Add content to journal-template.org.
+
+         The migration to journal-template.org is complete. Adding real content will be left as an exercise for the reader.
+
+ Self Check - Example 4 - Part I
+
+ After completing the instructions in this section, the contents of journal-template.org should be similar to self-check-example-04.org.
+ Export completed org-mode file as PDF
+
+ In this section, the objective is to export the org-mode template to LaTeX and create a PDF.
+ Instructions
+
+     Export an org-mode file as PDF via built-in LaTeX exporter.
+
+     To export an org-mode document to PDF:
+         Open the org-mode file in emacs.
+         Position the cursor in the buffer of the org-mode document in emacs.
+         Press the following key chords and keys, C-c C-e l p to initiate the export process.
+         Open the exported PDF file to validate the export process succeeded.
+
+ Self Check - Example 4 - Part II
+
+ After completing the instructions in this section, the contents of journal-template.org should be similar to self-check-example-04.pdf.
+
+     Note: The LaTeX file created during the export should be similar to self-check-example-04.tex.
+
+ Footnotes
+
+ 1 https://mc.manuscriptcentral.com/societyimages/epja/EPJA_templ.zip
+
+ 2 https://epja.epj.org/
+
+ 3 Description text for template.tex provided by EPJ A in read.me instructions.
+
+ 4 Description text for svepj.clo provided by EPJ A in read.me instructions.
+
+ 5 Description text for svjour.cls provided by EPJ A in read.me instructions.
+
+     This answer was validated using:
+     emacs: GNU Emacs 26.1
+     org-mode: 9.1.14
+** agenda
+*** archive all done tasks
+
+
+https://emacs.stackexchange.com/questions/28548/how-to-archive-all-completed-tasks-under-a-headline
+    C-c a to look at the agenda
+    < < to restrict the agenda to the buffer and then to the current sub-tree
+    M DONE to show everything matching a TODO keyword (search for DONE items in the current sub-tree)
+    * to mark everything in the agenda (all DONE items in the current subtree).
+    B $ to bulk archive everything you marked (i.e. everything)
+
+* Other emacs plugin
+** Auctex
+*** Fonts
+ 'C-c C-f C-b'
+      Insert bold face '\textbf{-!-}' text.
+
+ 'C-c C-f C-i'
+      Insert italics '\textit{-!-}' text.
+
+ 'C-c C-f C-e'
+      Insert emphasized '\emph{-!-}' text.
+
+ 'C-c C-f C-s'
+      Insert slanted '\textsl{-!-}' text.
+
+ 'C-c C-f C-r'
+      Insert roman '\textrm{-!-}' text.
+
+ 'C-c C-f C-f'
+      Insert sans serif '\textsf{-!-}' text.
+
+ 'C-c C-f C-t'
+      Insert typewriter '\texttt{-!-}' text.
+
+ 'C-c C-f C-c'
+      Insert SMALL CAPS '\textsc{-!-}' text.
+
+ 'C-c C-f C-d'
+      Delete the innermost font specification containing point.
+*** Insertion
+
+  C-c C-s to insert section, paragraph...
+  C-c C-e to insert environment
+
+ commenting
+ It offers shortcuts for commenting out text ('C-c ;' for the current region
+ or 'C-c %' for the paragraph you are in).  The same keystrokes will
+ remove the % signs, if the region or paragraph is commented out yet.
+*** Making life easy with yas-snippet
+ M-x yas-new-snippet
+*** Output, viewing and printing   
+**** Preview
+ C-c C-p C-b to activate preview in buffer
+ C-c C-p C-c C-b to disable preview in buffer
+**** Whole document
+ If you want to check how some part of your text looks like, and do not
+ want to wait until the whole document has been typeset, then mark it as
+ a region and use 'C-c C-r'.  It behaves just like 'C-c C-c', but it only
+ uses the document preamble and the region you marked.
+
+    If you are using '\include' or '\input' to structure your document,
+ try 'C-c C-b' while you are editing one of the included files.  It will
+ run 'latex' only on the current buffer, using the preamble from the
+ master file.
+
+**** Parts of the document
+ If you want to check how some part of your text looks like, and do not
+ want to wait until the whole document has been typeset, then mark it as
+ a region and use 'C-c C-r'.  It behaves just like 'C-c C-c', but it only
+ uses the document preamble and the region you marked.
+
+    If you are using '\include' or '\input' to structure your document,
+ try 'C-c C-b' while you are editing one of the included files.  It will
+ run 'latex' only on the current buffer, using the preamble from the
+ master file.
+
+*** Debugging
+**** Overview
+ Issue 'M-x TeX-error-overview RET' to see a nicely formatted list of
+ all errors and warnings reported by the compiler.
+
+**** Debugging
+
+ If there is a syntactical error in
+ your file, 'latex' will not complete successfully.
+
+
+ C-c `    (the last character is a backtick)
+ goto first error 
+ The view will be split in two windows, the output will be displayed in
+ the lower buffer, and both buffers will be centered around the place
+ where the error ocurred.
+ Similar to 'C-l', which centers the buffer you are in around your
+ current position, 'C-c C-l' centers the output buffer so that the last
+ lines added at the bottom become visible.
+
+ after trying to fix it,
+ C-c `    (the last character is a backtick)
+ goto next error
+
+ This procedure may be
+ repeated until all errors have been dealt with.  By pressing 'C-c C-w'
+ ('TeX-toggle-debug-boxes') you can toggle whether AUCTeX should notify
+ you of overfull and underfull boxes in addition to regular errors.
+
+***** Infinite loops
+    If a command got stuck in a seemingly infinite loop, or you want to
+ stop execution for other reasons, you can use 'C-c C-k' (for "kill").
+
+** Magit                                                              :louna:
+ See [[https://magit.vc/manual/magit.pdf][official website]]
+*** installation
+ M-x package-refresh-contents RET
+ M-x package-install RET magit RET
+*** shortcuts settings
+ From http://magit.vc/manual/magit.pdf
+ #+begin_src emacs-lisp 
+ (global-set-key (kbd "C-x g") 'magit-status)
+ (global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
+ ;; (global-magit-file-mode 1)
+ #+end_src
+*** Git, GitHub
+**** organisatino
+ - working directory: where you modify your files (local). Single
+   checkout of one version of the project.
+ - staging area: file storing information about what will go into your
+   next commit.
+ - .git repository: where Git stores the metadata and object database
+   for your project.
+**** Git workflow
+ 1. modify your files in working directory
+ 2. selectively stage just those changes you want to be part of your
+    next commit, which adds only those changes to the staging area.
+ 3. do a commit, which takes the files as they are in the staging area
+    and stores that snapshot permanently in your Git directory.
+
+ | working directory        | staging directory | .git directory     |
+ |--------------------------+-------------------+--------------------|
+ | -> git add               | -> git commit     | view the history:  |
+ |                          |                   | git log            |
+ | view the differences btw |                   |                    |
+ | working and staging:     |                   |                    |
+ | git diff                 |                   |                    |
+
+**** status
+ - modified: you have changed the file but have not committed et to
+   your database yet.
+ - staged: you have marked a modified file in its current version to go
+   into your next commit snapshot.
+ - committed: the data is safely stored in your local database.
+**** commands in shell
+ - *git init*: initializes a new Get repository and begins tracking an
+  existing directory. It adds a hidden subfolder within the existing
+  directory that houses the internal data structure required for
+  version control.
+ - *git clone*: creates a local copy of a project that already exist
+   remotely. The clone includes all the project’s files, history, and
+   branches.
+ - *git add*: stages a change. Git tracks changes to a developer’s
+   codebase, but it’s necessary to stage and take a snapshot of the
+   changes to include them in the project’s history. This command
+   performs staging, the first part of that two-step process. Any
+   changes that are staged will becone a part of the next snapshot and
+   a part of the project’s history. Staging and committing separately
+   gives developers complete control over the history of their project
+   without changing how they code and work.
+ - *git commit*: saves the snapshot to the project history and completes
+   the change-tracking process. In short, a commit functions like
+   taking a photo. Anything that has been staged with *git add* will
+   become a part of the snapshot with *git commit*.
+ - *git status*: shows the status of changes as untracked, modified, or
+   staged. Also shows where the *head* is pointing, and on what branch
+   you are.
+ - *git status -s*: short status: new files are marked with =??=, new files
+   that have been aded to the staging area are marked =A=, modified files
+   =M= and so on. The left-hand column indicates the status of the
+   staging area and the right-hand column indicates the status in the
+   working tree.
+ - *git diff*: to see what you’ve changed but not yet staged. Compares
+   the working directory with what is in your staging area.
+ - *git branch*: shows the branches being worked on locally.
+ - git merge: merges lines of development together. This command is
+   typically used to combine changes made on two distinct branches. For
+   example, a developer would merge when they want to combine changes
+   from a feature branch into the main branch for deployment.
+ - *git pull*: updates the local line of development with updates from
+   its remote counterpart. Developers use this command if a teammate
+   has made commits to a branch on a remote, and they would like to
+   reflect those changes in their local environment.
+ - *git push*: updates the remote repository with any commits made
+   locally to a branch.
+ - *git reset--soft*: take back a bunch of commits from the .git
+   directory to the staging directory, useful to regroup commits.
+ - *git reset*: take back commits  from the .git  directory to the
+   working directory. Caution!
+ - *git reset-hard*: destroy commits from the .git directory.
+**** ignore some files in shell
+ create a file listing patterns that you want git to ignore:
+ ;;=cat .gitignore
+ ;;*.[oa] # ignore files ending in .o or .a (objects and archives)
+ ;;*~     # ignore files ending with ~ (temporary files)
+ /OK, BUT  WHERE  ARE WE  SUPPOSED TO CREATE THAT FILE ?/???
+**** Github
+ - create a branch: to contribute to many parallel efforts.
+ - add commits: snapshots of development efforts within a branch create
+   safe, revertible points in the project’s history.
+ - open a pull request: publicize a project’s ongoing efforts and set
+   the tone for a transparent development process.
+ - discuss and review code: teams participate in code reviews by
+   commenting, testing, and reviewing open pull requests.
+ - merge: upon clicking merge, GitHub automatically performs the
+   equivalent of a local *git merge* operation.
+ - deploy: teams can choose the best release cycles or incorporate
+   continuous integration tools and operate with the assurance that
+   code on the deployment branch has gone through a robust workflow. ???
+
+
+ C-X g: launch magit
+ C commit: choice of modifications to commit, and message of commit
+ C-x 1: close magit
+
+
+
+*** shortcuts using Magit
+ - C-x g: git status + git diff + git diff --cached + git log --oneline
+   origin/master + git log --oneline ..origin/master +…
+   Shows unstaged changes, stashes, unpulled from origin/master and
+   unmerged into origin/master, can develop by pressing TAB on
+   collapsed sections
+ - RET with point on a commit: shows the message and diff for that commit
+ - C-p: move to previous section
+ - C-n: move to next section
+ - M-p: move to previous section on the same level as current section
+ - M-n: move to next section on the same level as current section
+***** actions
+ - s with point on an unstaged commit: stage that commit (no need to say you
+   don’t want to stage the previous nor following commits)
+ - S: stage everything
+ - u with point on an staged commit: unstage that commit (no need to say you
+   don’t want to unstage the previous nor following commits)
+ - U: unstage everything
+ Rq: to apply changes to a region of similar entities (commits), select this region with C-SPC to set
+ the mark, move to the other end, then do the action.
+***** popups and help
+ - D: show the diff arguments popup
+ - C-t: show all commands available in popups
+ - ?: show the popup of popups, with all the shortcuts available when
+   point is in the magit window
+ - l: log popup, shows all the shortcuts available to see the history
+   of files
+ - c: show the committing popup
+ - c c: commit in the regular way. The commit fessage buffer is opened
+   in one buffer. and another buffer shows the changes about to be
+   committed. finish with C-c C-c
+ - r: rebase popup
+** lsp-mode
+*** setup (system crafters)
+ video used: https://www.youtube.com/watch?v=jPXIP46BnNA&t=323s
+ link that can be useful:
+ https://emacs-lsp.github.io/lsp-mode/
+
+ first, install language server on your pc:
+ (I needed to uninstall my things first, and with sudo)
+ sudo pip3 install python-language-server[all]
+
+ but
+ sudo pip3 install --user python-language-server[all]
+
+ can download it locally and make it work on your session
+
+ verify by entering
+ pyls
+
+ if it waits for an entry, then it works
+
+*** setup
+ lps-ui is very useful to get popups and sideline info
+ fly check and company can also be useful
+ for python, you can use pyls as main language server: 
+
+ python-language-server[all] 
+
+ if you want all the features, and without the [all] if you want to
+ select what you want. You also have other plugins that are very useful:
+ pyls-black, isort and mypy
+ flake8 is also very useful (verify pep8 recommendations)
+
+ I don't know why but I had to manually install lsp-mode and lsp-ui with
+ M-x list-package
+*** inspect lsp-mode
+  - *pyls::stderr* buffer can show you if something went wrong 
+  - (setq lsp-log-io t) will log messages between lsp client and server
+    to a buffer, to view this buffer use (lsp-workspace-show-log)
+  - lsp-client-settings is a variable that contains all the lsp-mode settings
+  - lsp-mode trouble shooting section will help you
+
+*** useful tools lsp dev
+ C-c l r r 
+ to rename a something in the whole file!
+ C-c l T S 
+ to activate sideline (lsp-ui) for instance
+ C-c l g g lsp find defifition
+ jump to definition of a fonction under the cursor
+ C-c l g r lsp find references
+ jump to references of sth under the cursor
+ C-c l = = lsp format buffer
+ format the buffer to solve things that flycheck complains about
+
+
+
+*** use pipenv with emacs
+** projectile
+*** project testing
+ you can setup tests for a project, and while changing things in emacs
+ test it with a simple command (C-c p P)
+
+ it doesn't do anything by default, you have to set the commands you
+ want to run
+
+** pdf-tools
+
+ pdf-tools
+
+ If you decide to install pdf-tools package (also available on Melpa) to view PDF files (instead of doc-view-mode), you can view the PDF in "midnight mode" by using the default binding C-c C-r m or by doing M-x pdf-view-midnight-minor-mode.
+
+ The default colors of this minor mode are,
+
+     Foreground color - #839496
+     Background color - #002b36
+
+ But you can customize those by customizing the variable pdf-view-midnight-colors.
+ From C-h v pdf-view-midnight-colors,
+
