@@ -533,6 +533,27 @@ variables to different values, all in one expression.
      (setq trees '(pine fir oak maple)
            herbivores '(gazelle antelope zebra))
 
+** handling error messages
+you can see a full backtrace of any error with: =debug-on-error= set
+to =t=. To set this variable, you can press C-x C-e at the end of this
+line:
+
+(setq debug-on-error t)
+
+or execute this code block
+
+#+begin_src emacs-lisp 
+(setq debug-on-error t)
+#+end_src
+
+to desactivate it, same thing in reverse:
+
+#+begin_src emacs-lisp 
+(setq debug-on-error nil)
+#+end_src
+
+#+RESULTS:
+
 * Org-mode
 ** Structures
 *** Sparse trees
@@ -1248,6 +1269,34 @@ https://emacs.stackexchange.com/questions/28548/how-to-archive-all-completed-tas
     B $ to bulk archive everything you marked (i.e. everything)
 
 * Other emacs plugin
+** org-.* packages
+*** org roam
+**** org roam templates
+you can simply include files
+#+begin_src emacs-lisp 
+     ("a" "article" plain
+"* %^{Title?}
+:PROPERTIES:
+:field:    %^{field|physics|mathematics|biololgy|chemistry|computer_science}
+:keywords: %^{keywords?}
+:END:
+#+filetags: article\n
+%?
+"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+      :unnarrowed t)
+#+end_src
+
+
+into that
+
+#+begin_src emacs-lisp 
+     ("a" "article" plain
+     (file "/path")
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+      :unnarrowed t)
+#+end_src
+
 ** Auctex
 *** Fonts
  'C-c C-f C-b'

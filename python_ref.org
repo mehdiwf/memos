@@ -411,6 +411,17 @@ except ImportError:
     from defaultlib import abc as foo
 #+end_src
 ** Particular
+*** pile/"rope" structure
+#+begin_src python :results output
+from collections import deque
+Q = deque([1, 3, 5])
+print(Q.popleft())
+print(Q.pop())
+Q.append(8)
+print(Q)
+Q.appendleft(10)
+print(Q)
+#+end_src
 *** Progress bar
 #+begin_src python :results output
 import sys

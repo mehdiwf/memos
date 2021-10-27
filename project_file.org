@@ -9,6 +9,7 @@ cp /home/mehdi/dossiers/perso/notes/emacs/memo_emacs.org ./
 cp /home/mehdi/dossiers/programmation/python/python_ref.org ./
 cp /home/mehdi/dossiers/programmation/emacs_lisp_ref.org ./
 cp /home/mehdi/dossiers/programmation/emacs/memo_org_exterior.org ./
+cp /home/mehdi/dossiers/perso/notes/emacs/org_export_memo/org_export.org ./
 #+end_src
 
 #+RESULTS:
