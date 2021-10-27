@@ -1,0 +1,416 @@
+#+begin_comment
+Common options can be called easily with =C-c C-e #=
+#+end_comment
+
+#+begin_comment
+if you want to see images inline by default
+#+end_comment
+#+startup: inlineimages
+
+#+begin_comment
+this allows me to place the toc where I want, with
+#+TOC: headlines 2
+at the place I want
+#+end_comment
+#+OPTIONS: toc:nil
+
+#+begin_comment
+see 
+https://orgmode.org/manual/Export-Settings.html
+to know what options you have
+for instance you could do:
+#+OPTIONS: toc:nil date:nil 
+#+end_comment
+
+#+author: 
+#+latex_class: article
+#+latex_class_options: [a4paper]
+#+title: Org mode export magic!
+#+subtitle: Making your life easy after taking a (sometimes tiring, I agree) night to configure org export.
+#+latex_compiler: pdflatex
+#+date: \today
+#+language: fr
+
+#+latex_header: \usepackage[utf8]{inputenc} %% For unicode chars
+#+latex_header: \renewcommand*{\contentsname}{Sommaire} %% to change toc name
+
+#+begin_comment
+% for [H] and things like that
+#+end_comment
+#+latex_header: \usepackage{float}
+Thanks for reading :D
+
+#+TOC: headlines 2
+
+* Basic stuff
+** Writing stuff
+So this is my first emacs/latex export... nice![fn:1:Oh it can also do footnotes!]
+And if I return.[fn:2:With the RET key...]
+It stays in the same sentence.[fn:3:Useful for structuring your text!]
+As latex does.
+
+But if I return two times, it interprets this as a new paragraph... as latex does.
+
+#+begin_comment
+These comments will not be exported!
+You can do footnotes sort automatic and inline by default in your init.el like this:
+
+#+begin_src emacs-lisp 
+  (setq org-footnote-auto-adjust t)
+  (setq org-footnote-define-inline t)
+#+end_src
+
+also the key binding for footnotes in org is =C-C C-x f= 
+#+end_comment
+
+You can also put things like *that* or like _that_ or like /that/... or
+even like +that+!
+
+\newpage
+
+You can also put a new page!
+
+----------
+and vertical lines... for more info, check org manual!
+** an overview of options
+You can also put options at the start of your document (or anywhere
+actually?) to change things in the export:
+
+#+begin_example
+for class and options:
+#+latex_class: article
+#+latex_class_options:
+
+enable table of contents:
+#+options: toc:t 
+disable table of contents:
+#+options: toc:nil
+#+end_example
+You can see *all* the options you can set in [[https://orgmode.org/manual/Export-Settings.html#Export-Settings][Org mode manual export settings]].
+* Pdf opening
+Editing your pdf and viewing the result in emacs is even more
+pleasant, you can open you pdfs in emacs, even after an export by
+using:
+
+#+begin_src emacs-lisp 
+(use-package org-pdftools
+  :hook (org-mode . org-pdftools-setup-link))
+
+(add-to-list 'org-file-apps 
+             '("\\.pdf\\'" . (lambda (file link)
+                                     (org-pdftools-open link))))
+#+end_src
+in your init file
+
+and yeah, you can put source code in your pdf. This code can be
+highlighted with minted for instance, but I don't know how :). You can
+also ask org to show the results on the pdf too! By putting\\
+=:results output :exports result= \\
+after your\\
+=#+begin_src python=\\
+in orgmode
+------------
+:todo:
+#+begin_src python :results output :exports result
+def f(a, b, c):
+    d = a+b+c
+    return d
+print( f(1,2,5) )
+
+#+end_src
+
+#+RESULTS:
+: 8
+
+And here is the result!
+
+------------
+
+* Tables
+
+you can also have tables
+
+#+name: cool table
+#+label: coot_table
+| a | b |    c |
+| 1 | 3 |    4 |
+| 3 | 2 | 1.32 |
+
+
+\newpage
+* Managing references
+** Installation
+You can install [[https://github.com/jkitchin/org-ref][org-ref]] which provides great... ref tools!
+
+Personnally, I had this error when trying to use some functions:
+=Symbol’s function definition is void: org-ref-possible-bibfiles= But
+with the config snippet below, and after deleting and re-installing
+org-ref manually (via M-x list-packages) it works well!
+
+Put this in your init file, replacing your default reference
+keybindings by your preference: (you will need the [[https://github.com/noctuid/general.el][general]] package to
+create my bindings)
+#+begin_src emacs-lisp 
+(use-package org-ref
+  :after org-mode)
+
+(setq reftex-default-bibliography '("~/Documents/srx/bibliographie/references.bib"))
+
+;; see org-ref for use of these variables
+(setq org-ref-bibliography-notes "~/Documents/srx/bibliographie/notes.org"
+      org-ref-default-bibliography '("~/Documents/srx/bibliographie/references.bib")
+      org-ref-pdf-directory "~/Documents/srx/bibliographie/bibtex-pdfs/")
+
+;; helps org export to latex to handle well bibliography
+(setq org-latex-pdf-process
+      '("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"bibtex %b"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+
+(require 'org-ref)
+(general-define-key  
+  "C-c ("  'org-ref-helm-insert-ref-link
+  "C-c ["  'org-ref-helm-insert-cite-link)
+
+#+end_src
+
+** Tools unlocked!
+*** Linking your bibfile
+This tools allows you to link a bibliography file to your org-document
+and pick references from it. For that, create a file called
+bibfile.bib in the same directory as your org file (you can replace
+bibfile.bib by bibdir/bibfile.bib if your bibfile is in bibdir)
+
+And connect your bibfile with:
+#+begin_example
+bibliography:bibfile.bib 
+#+end_example
+
+at the end of your file
+
+And then you can open it as an org link and modifiy the content of
+your bibfile with some really handy functions!
+
+*** Adding bibtex entry
+In [[https://www.youtube.com/watch?v=2t925KRBbFc][this video]] created by org-ref creator, you can see in 00:45 that he
+can get the bib entry just by dragging pdf in your bibfile. But I
+prefer to use these functions that I call with =M-x=:
+
+- =doi-add-bibtex-entry=
+- =crossref-add-bibtex-entry=
+
+=doi-add-bibtex-entry= can get a bibtex entry if you feed it the DOI,
+and =crossref-add-bibtex-entry= tries to find the entry if you feed it a
+reference (commonly seen in bibliography) like:
+
+/M. Schlichenmaier, An elementary proof of the vanishing of the/
+/secondcohomology of the witt and virasoro algebra with values in the
+adjointmodule,Forum Mathematicum26(2011)/
+
+If it finds more than one candidate, you will have to choose the one
+that fits. *AND* I think it will try to download the file if possible,
+so be careful that it doesn't fill your bibtex-pdf/ directory for no reasons.
+
+*** Citing a paper in your bibfile
+
+You can cite a paper that is in your bibfile by pressing =C-c [= (or
+=org-ref-helm-insert-ref-link=) and then typing a pattern that is on the
+name of the paper or the name of an anthor, and it will find the thing
+that fits best (you can also use =C-n= and =C-p=).
+cite:silveira09_low_dimen_model_stick_slip
+
+This citation is generated by this snippet:
+#+begin_example
+cite:silveira09_low_dimen_model_stick_slip
+#+end_example
+
+You can also cite more than one by marking them with =C-SPC= and then
+press =RET=. cite:soize08_robus_updat_uncer_comput_model,bera2021quantum
+
+Or alternate cites
+like citenum:soize08_robus_updat_uncer_comput_model 
+(actually it doesn't work, I don't know why.)
+
+by modifying the link.
+This citation is generated by this snippet:
+#+begin_example
+citenum:soize08_robus_updat_uncer_comput_model,bera2021quantum by
+#+end_example
+\newpage
+
+* Latex embedded
+let's say that we wanna write an equation. Well, we use a latex export
+code block =C-c C-, l=:
+
+#+begin_example
+#+begin_export latex
+
+\begin{equation} \label{integral}
+\int_{a}^{b}\sum\limits_{i=0}^{n}f_n(t)dt 
+\end{equation}
+
+#+end_export
+#+end_example
+
+#+begin_export latex
+\begin{equation} \label{integral}
+\int_{a}^{b}\sum\limits_{i=0}^{n}f_n(t)dt 
+\end{equation}
+#+end_export
+
+to refer to this equation, you can use =C-(= or
+=org-ref-helm-insert-ref-link:= please see equation ref:integral
+
+citation created by:
+#+begin_example
+ref:integral 
+#+end_example
+
+or rather equation eqref:integral
+
+citation created by:
+#+begin_example
+eqref:integral 
+#+end_example
+
+the bindings I have, which are =C-c (= and =C-c [= are my preferences, but
+you can modify them in the config easily if you look at them on the
+snippet I gave earlier for installation.
+
+You can also refer to things called in org:
+
+label:table
+#+attr_export: :placement [H]
+#+caption: a tinyyy table
+| a | b |
+| 1 | 2 |
+
+look at the table ref:table
+
+\newpage
+
+#+begin_src python :exports none :results silent
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(0, np.pi)
+y = np.sinh(x)
+plt.plot(x, y)
+plt.xlabel('x')
+plt.ylabel('sinh(x)')
+plt.savefig('sinh.png')
+#+end_src
+
+#+attr_latex: :placement [H] :scale 0.3
+#+caption: plotting is a sinh. label:fig-sinh
+[[./sinh.png]]
+
+The results are in Figure ref:fig-sinh.\\
+The caption and label is set just before the link of the image in org
+mode by:
+#+begin_example
+#+caption: plotting is a sinh. label:fig-sinh
+#+end_example
+and you can put labels and caption before anything you want!
+|---+---|
+| A | B |
+|---+---|
+| 1 | 2 |
+
+(the org-mode way of citing things is to put =#+label: thing= ) (but I
+didn't test it, as org ref helps a lot finding your labels)
+
+The only thing that I don't know how to do it is to have a keybinding
+to refresh visualisation when using insert ref/citation (I had to
+revert buffer to have the new things), and how to insert a label (but
+typing label: isn't that hard so...)
+
+* Problem?
+We may have a problem on numbering refs ... see the table? Maybe it's
+because I used multiple labelling methods?
+
+\vspace{2cm}
+
+You can write (org-ref way)
+#+begin_example
+label:test
+#+end_example
+
+or in a latex block (latex way)
+
+#+begin_example
+#+begin_export latex
+\begin{equation}
+  \label{eq:labeldeouf}
+  a + b = yay
+\end{equation}
+#+end_export 
+#+end_example
+
+or even (I think): (org-mode way)
+#+begin_example
+#+name: coolname
+#+end_example
+
+\newpage
+* export tricks
+#+begin_example
+$ \dot{x} = x$
+#+end_example
+doesn't work, but 
+#+begin_example
+$\dot{x} = x$
+#+end_example
+does. 
+
+#+begin_example
+*** test\\
+#+end_example
+doesn't work, but 
+#+begin_example
+*** test
+#+end_example
+does. 
+
+#+begin_example
+$C(n) \leqslant 2log_2(n)$\\
+#+end_example
+doesn't work, but 
+#+begin_example
+$C(n) \leqslant 2log_2(n)$ \\
+#+end_example
+does. 
+
+
+#+begin_example
+le nombre de chiffres de a,b,c d est \leqslant n/2.\\
+Le coût en termes de produits de chiffres:\\
+#+end_example
+doesn't work, but 
+#+begin_example
+le nombre de chiffres de a,b,c d est $\leqslant n/2$.\\
+Le coût en termes de produits de chiffres:\\
+#+end_example
+does. 
+
+#+begin_example
+$\dot{x} = x $
+#+end_example
+doesn't work, but 
+#+begin_example
+$\dot{x} = x$
+#+end_example
+does. 
+
+if something fucks up, just use 
+#+begin_example
+#+begin_export latex
+#+end_export
+#+end_example
+
+
+* Bibliography
+
+bibliographystyle:unsrt
+bibliography:bibfile.bib 
