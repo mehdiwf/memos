@@ -121,6 +121,86 @@ import os
 sum(os.path.getsize(f) for f in os.listdir(directory) if os.path.isfile(f))
 #+end_src
 
+**** exporting files
+***** TODO rewrite this less particular
+#+begin_src python :results output
+import numpy as np
+
+csv_file_name = 'donnees_formatees.csv'    
+
+with open(csv_file_name) as f:
+    lines = (line for line in f if not line.startswith('#'))
+    data = np.genfromtxt(lines, delimiter=',', dtype='object')
+
+def create_csv_file(material_list, csv_name_file):    
+    nb_material = len(material_list)
+    #nb is nb_material
+    young_table = np.zeros((nb_material + 1, 3), dtype='object')
+    poisson_table = np.zeros((nb_material + 1, 3), dtype='object')
+    young_table[0,0] = ' '
+    poisson_table[0,0] = ' '
+    young_table[0,1], young_table[0,2] = 'Module de Young', 'Intervalle de confiance (95%)'
+    poisson_table[0,1], poisson_table[0,2] = 'Coefficient de Poisson', 'Intervalle de confiance (95%)'
+
+    for i in range(nb_material):
+        name_ref = material_list[i][0]
+        name = material_list[i][1]
+
+        i_table = i+1
+        young_table[i_table,0] = name
+        poisson_table[i_table,0] = name
+        indice = np.where(data==name_ref)[0][0]
+
+        young_table[i_table, 1], young_table[i_table, 2] = float(data[indice, 1]), float(data[indice, 2])
+        poisson_table[i_table, 1], poisson_table[i_table, 2] = float(data[indice, 3]), float(data[indice, 4])
+    np.savetxt('{}_poisson.csv'.format(csv_name_file), poisson_table, delimiter = ',', fmt='%s')
+    np.savetxt('{}_young.csv'.format(csv_name_file), young_table, delimiter = ',', fmt='%s')
+
+names = np.array(data[:,0], dtype='str')
+numbers = np.array(data[:,1:5], dtype='float')
+
+metals_list = [[b'acier_polie',
+                'acier 304-L'],
+               [b'aluminium_AG5',
+                'aluminium AG5'],
+               [b'aluminium_AUG4',
+                'aluminium AUG4'],
+               [b'cuivre',
+                'cuivre'],
+               [b'laiton',
+                'laiton'],
+               [b'nickel',
+                'nickel'],
+               [b'titane',
+                'titane T6AV'],
+               [b'tantale',
+                'tantale'],
+               [b'molybdene',
+                'molybdène'],
+               [b'fonte',
+                'fonte']]
+
+crystals_list = [[b'ZrO2',
+                  'ZrO2'],
+                 [b'LiNbO3_face_',
+                  'LiNbO3'],
+                 [b'LGT',
+                  'LGT']]
+
+acier_surfaces_list = [[b'acier_polie',
+                        'face polie'],
+                       [b'acier_ecrouie',
+                        'face écrouie'],
+                       [b'acier_striee_para',
+                        'face striée parallèle'],
+                       [b'acier_striee_perp',
+                        'face striée perpandiculaire']]
+
+create_csv_file(metals_list,'metals_csv')
+create_csv_file(crystals_list,'crystals_csv')
+create_csv_file(acier_surfaces_list,'acier_surfaces_csv')
+
+#+end_src
 *** Types and their methods
 **** String
 ***** String formating
@@ -171,6 +251,19 @@ Sum = B[A].sum()
 
 data_L[data_L > 90] = 180 - data_L[data_L > 90]
 
+#+end_src
+
+****** exemple 2
+
+numerical_data[:,2] is the uncertainty
+numerical_data[:,2] is the measurement
+
+here we troncate the results that have too much uncertainty (because
+it bloated the plot with a huge errorbar, not because I am cheating)
+
+#+begin_src python :results output
+mask = numerical_data[:,2]/numerical_data[:,1] < 0.5
+numerical_data_troncated = numerical_data[mask]
 #+end_src
 
 ***** Sorting consistently
@@ -317,7 +410,6 @@ pour faire un test:
 #assert sys.version_info >= (2, 5),"your version is less than 2.5"
 #+end_src
 *** Plot graph
-
 **** refrences
 https://scipy-lectures.org/intro/matplotlib/
 https://towardsdatascience.com/an-introduction-to-making-scientific-publication-plots-with-python-ea19dfa7f51e
@@ -379,6 +471,13 @@ plt.show()
 
 #+RESULTS:
 
+**** latex in plots
+it's with =r"I want write in $LaTeX$"= !
+example:
+
+#+begin_src python :results output
+ax.set(ylabel=r"$\nu$ Coefficient de poisson")
+#+end_src
 *** Fonctions
 **** inline functions
 inline function

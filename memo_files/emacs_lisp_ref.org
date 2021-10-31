@@ -1,4 +1,5 @@
-* crux things that may be useful
+* Crux code
+** crux things that may be useful
 ;;; crux.el --- A Collection of Ridiculously Useful eXtensions -*- lexical-binding: t -*-
 ;;
 ;; Copyright © 2015-2021 Bozhidar Batsov
@@ -11,12 +12,12 @@
 
 ;; This file is not part of GNU Emacs.
 
-;;; Commentary:
+**  Commentary:
 
 ;; A cornucopia of useful interactive commands to make your Emacs
 ;; experience more enjoyable.
 
-;;; License:
+**  License:
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -33,7 +34,9 @@
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
-;;; Code:
+** functions (not nicely separated)
+***  Code:
+#+begin_src emacs-lisp 
 
 (require 'thingatpt)
 (require 'seq)
@@ -160,7 +163,9 @@ expected name of the shell buffer."
   "Use eshell for `crux-visit-term-buffer'"
   (shell (format "*%s*" buffer-name)))
 
-;;;###autoload
+#+end_src
+*** crux-open-with (arg)
+#+begin_src emacs-lisp 
 (defun crux-open-with (arg)
   "Open visited file in default external program.
 When in dired mode, open file under the cursor.
@@ -202,8 +207,9 @@ the current buffer."
         (other-window 1)
         (funcall function))
     (switch-to-buffer-other-window buffer-name)))
-
-;;;###autoload
+#+end_src
+*** crux-visit-term-buffer ()
+#+begin_src emacs-lisp 
 (defun crux-visit-term-buffer ()
   "Create or visit a terminal buffer.
 If the process in that buffer died, ask to restart."
@@ -216,7 +222,9 @@ If the process in that buffer died, ask to restart."
     (kill-buffer-and-window)
     (crux-visit-term-buffer)))
 
-;;;###autoload
+#+end_src
+*** crux-visit-shell-buffer ()
+#+begin_src emacs-lisp 
 (defun crux-visit-shell-buffer ()
   "Create or visit a shell buffer.
 If the process in that buffer died, ask to restart."
@@ -230,7 +238,9 @@ If the process in that buffer died, ask to restart."
     (kill-buffer-and-window)
     (crux-visit-shell-buffer)))
 
-;;;###autoload
+#+end_src
+*** crux-indent-rigidly-and-copy-to-clipboard (begin end arg)
+#+begin_src emacs-lisp 
 (defun crux-indent-rigidly-and-copy-to-clipboard (begin end arg)
   "Indent region between BEGIN and END by ARG columns and copy to clipboard."
   (interactive "r\nP")
@@ -241,7 +251,9 @@ If the process in that buffer died, ask to restart."
       (indent-rigidly (point-min) (point-max) arg)
       (clipboard-kill-ring-save (point-min) (point-max)))))
 
-;;;###autoload
+#+end_src
+*** crux-smart-open-line-above ()
+#+begin_src emacs-lisp 
 (defun crux-smart-open-line-above ()
   "Insert an empty line above the current line.
 Position the cursor at its beginning, according to the current mode."
@@ -262,7 +274,9 @@ Position the cursor at its beginning, according to the current mode."
     (forward-line -1)
     (indent-according-to-mode)))
 
-;;;###autoload
+#+end_src
+*** crux-smart-open-line (arg)
+#+begin_src emacs-lisp 
 (defun crux-smart-open-line (arg)
   "Insert an empty line after the current line.
 Position the cursor at its beginning, according to the current mode.
@@ -274,7 +288,9 @@ With a prefix ARG open line above the current line."
     (move-end-of-line nil)
     (newline-and-indent)))
 
-;;;###autoload
+#+end_src
+*** crux-smart-kill-line ()
+#+begin_src emacs-lisp 
 (defun crux-smart-kill-line ()
   "Kill to the end of the line and kill whole line on the next call."
   (interactive)
@@ -285,13 +301,17 @@ With a prefix ARG open line above the current line."
       (goto-char orig-point)
       (kill-line))))
 
-;;;###autoload
+#+end_src
+*** crux-top-join-line ()
+#+begin_src emacs-lisp 
 (defun crux-top-join-line ()
   "Join the current line with the line beneath it."
   (interactive)
   (delete-indentation 1))
 
-;;;###autoload
+#+end_src
+*** crux-kill-whole-line (&optional arg)
+#+begin_src emacs-lisp 
 (defun crux-kill-whole-line (&optional arg)
   "A simple wrapper around command `kill-whole-line' that respects indentation.
 Passes ARG to command `kill-whole-line' when provided."
@@ -299,14 +319,18 @@ Passes ARG to command `kill-whole-line' when provided."
   (kill-whole-line arg)
   (crux-move-to-mode-line-start))
 
-;;;###autoload
+#+end_src
+*** crux-kill-line-backwards ()
+#+begin_src emacs-lisp 
 (defun crux-kill-line-backwards ()
   "Kill line backwards and adjust the indentation."
   (interactive)
   (kill-line 0)
   (indent-according-to-mode))
 
-;;;###autoload
+#+end_src
+*** crux-kill-and-join-forward (&optional arg)
+#+begin_src emacs-lisp 
 (defun crux-kill-and-join-forward (&optional arg)
   "If at end of line, join with following; otherwise kill line.
 Passes ARG to command `kill-line' when provided.
@@ -316,7 +340,9 @@ Deletes whitespace at join."
       (delete-indentation 1)
     (kill-line arg)))
 
-;;;###autoload
+#+end_src
+*** crux-move-to-mode-line-start ()
+#+begin_src emacs-lisp 
 (defun crux-move-to-mode-line-start ()
   "Move to the beginning, skipping mode specific line start regex."
   (interactive)
@@ -331,7 +357,9 @@ Deletes whitespace at join."
                                 (assoc 'default crux-line-start-regex-alist)))))
     (search-forward-regexp line-start-regex (line-end-position) t)))
 
-;;;###autoload
+#+end_src
+*** crux-move-beginning-of-line (arg)
+#+begin_src emacs-lisp 
 (defun crux-move-beginning-of-line (arg)
   "Move point back to indentation of beginning of line.
 
@@ -355,7 +383,9 @@ point reaches the beginning or end of the buffer, stop there."
     (when (= orig-point (point))
       (move-beginning-of-line 1))))
 
-;;;###autoload
+#+end_src
+*** crux-indent-defun ()
+#+begin_src emacs-lisp 
 (defun crux-indent-defun ()
   "Indent the current defun."
   (interactive)
@@ -374,7 +404,9 @@ point reaches the beginning or end of the buffer, stop there."
     (setq end (line-end-position))
     (cons beg end)))
 
-;;;###autoload
+#+end_src
+*** crux-duplicate-current-line-or-region (arg)
+#+begin_src emacs-lisp 
 (defun crux-duplicate-current-line-or-region (arg)
   "Duplicates the current line or region ARG times.
 If there's no region, the current line will be duplicated.  However, if
@@ -391,7 +423,9 @@ there's a region, all lines that region covers will be duplicated."
       (setq end (point)))
     (goto-char (+ origin (* (length region) arg) arg))))
 
-;;;###autoload
+#+end_src
+*** crux-duplicate-and-comment-current-line-or-region (arg)
+#+begin_src emacs-lisp 
 (defun crux-duplicate-and-comment-current-line-or-region (arg)
   "Duplicates and comments the current line or region ARG times.
 If there's no region, the current line will be duplicated.  However, if
@@ -410,7 +444,9 @@ there's a region, all lines that region covers will be duplicated."
       (setq end (point)))
     (goto-char (+ origin (* (length region) arg) arg))))
 
-;;;###autoload
+#+end_src
+*** crux-rename-file-and-buffer ()
+#+begin_src emacs-lisp 
 (defun crux-rename-file-and-buffer ()
   "Rename current buffer and if the buffer is visiting a file, rename it too."
   (interactive)
@@ -428,7 +464,9 @@ there's a region, all lines that region covers will be duplicated."
 
 (defalias 'crux-rename-buffer-and-file #'crux-rename-file-and-buffer)
 
-;;;###autoload
+#+end_src
+*** crux-delete-file-and-buffer ()
+#+begin_src emacs-lisp 
 (defun crux-delete-file-and-buffer ()
   "Kill the current buffer and deletes the file it is visiting."
   (interactive)
@@ -443,7 +481,9 @@ there's a region, all lines that region covers will be duplicated."
 
 (defalias 'crux-delete-buffer-and-file #'crux-delete-file-and-buffer)
 
-;;;###autoload
+#+end_src
+*** crux-copy-file-preserve-attributes (visit)
+#+begin_src emacs-lisp 
 (defun crux-copy-file-preserve-attributes (visit)
     "Copy the current file-visiting buffer's file to a destination.
 
@@ -491,7 +531,9 @@ When invoke with C-u, the newly created file will be visited.
                  (when visit
                    (find-file-other-window destination))))))))))
 
-;;;###autoload
+#+end_src
+*** crux-view-url ()
+#+begin_src emacs-lisp 
 (defun crux-view-url ()
   "Open a new buffer containing the contents of URL."
   (interactive)
@@ -507,7 +549,9 @@ When invoke with C-u, the newly created file will be visited.
     (delete-blank-lines)
     (set-auto-mode)))
 
-;;;###autoload
+#+end_src
+*** crux-cleanup-buffer-or-region ()
+#+begin_src emacs-lisp 
 (defun crux-cleanup-buffer-or-region ()
   "Cleanup a region if selected, otherwise the whole buffer."
   (interactive)
@@ -517,7 +561,9 @@ When invoke with C-u, the newly created file will be visited.
     (call-interactively #'indent-region))
   (whitespace-cleanup))
 
-;;;###autoload
+#+end_src
+*** crux-eval-and-replace ()
+#+begin_src emacs-lisp 
 (defun crux-eval-and-replace ()
   "Replace the preceding sexp with its value."
   (interactive)
@@ -525,7 +571,9 @@ When invoke with C-u, the newly created file will be visited.
     (backward-kill-sexp)
     (insert (format "%S" value))))
 
-;;;###autoload
+#+end_src
+*** crux-recompile-init ()
+#+begin_src emacs-lisp 
 (defun crux-recompile-init ()
   "Byte-compile all your dotfiles again."
   (interactive)
@@ -559,7 +607,9 @@ See `file-attributes' for more info."
                                  (or remote-host "localhost")
                                  (or remote-localname filename)))))
 
-;;;###autoload
+#+end_src
+*** crux-sudo-edit (&optional arg)
+#+begin_src emacs-lisp 
 (defun crux-sudo-edit (&optional arg)
   "Edit currently visited file as root.
 
@@ -583,7 +633,9 @@ buffer is not visiting a file."
         (crux-find-alternate-file-as-root buffer-file-name)
         (goto-char place)))))
 
-;;;###autoload
+#+end_src
+*** crux-reopen-as-root ()
+#+begin_src emacs-lisp 
 (defun crux-reopen-as-root ()
   "Find file as root if necessary.
 
@@ -596,7 +648,9 @@ See also `crux-reopen-as-root-mode'."
               (crux-file-owned-by-user-p buffer-file-name))
     (crux-find-alternate-file-as-root buffer-file-name)))
 
-;;;###autoload
+#+end_src
+*** minor-mode crux-reopen-as-root-mode
+#+begin_src emacs-lisp 
 (define-minor-mode crux-reopen-as-root-mode
   "Automatically reopen files as root if we can't write to them
 as the current user."
@@ -606,13 +660,17 @@ as the current user."
       (add-hook 'find-file-hook #'crux-reopen-as-root)
     (remove-hook 'find-file-hook #'crux-reopen-as-root)))
 
-;;;###autoload
+#+end_src
+*** crux-insert-date ()
+#+begin_src emacs-lisp 
 (defun crux-insert-date ()
   "Insert a timestamp according to locale's date and time format."
   (interactive)
   (insert (format-time-string "%c" (current-time))))
 
-;;;###autoload
+#+end_src
+*** crux-recentf-find-file (&optional filter)
+#+begin_src emacs-lisp 
 (defun crux-recentf-find-file (&optional filter)
   "Find a recent file using `completing-read'.
 When optional argument FILTER is a function, it is used to
@@ -627,14 +685,18 @@ transform recent files before completion."
 
 (define-obsolete-function-alias 'crux-recentf-ido-find-file 'crux-recentf-find-file "0.4.0")
 
-;;;###autoload
+#+end_src
+*** crux-recentf-find-directory ()
+#+begin_src emacs-lisp 
 (defun crux-recentf-find-directory ()
   "Find a recent directory using `completing-read'."
   (interactive)
   (crux-recentf-find-file (lambda (file) (abbreviate-file-name (file-name-directory file)))))
 
 ;; modified from https://www.emacswiki.org/emacs/TransposeWindows
-;;;###autoload
+#+end_src
+*** crux-transpose-windows (arg)
+#+begin_src emacs-lisp 
 (defun crux-transpose-windows (arg)
   "Transpose the buffers shown in two windows.
 Prefix ARG determines if the current windows buffer is swapped
@@ -649,14 +711,18 @@ transpositions to execute in sequence."
 
 (defalias 'crux-swap-windows 'crux-transpose-windows)
 
-;;;###autoload
+#+end_src
+*** crux-switch-to-previous-buffer ()
+#+begin_src emacs-lisp 
 (defun crux-switch-to-previous-buffer ()
   "Switch to previously open buffer.
 Repeated invocations toggle between the two most recently open buffers."
   (interactive)
   (switch-to-buffer (other-buffer (current-buffer) 1)))
 
-;;;###autoload
+#+end_src
+*** crux-other-window-or-switch-buffer ()
+#+begin_src emacs-lisp 
 (defun crux-other-window-or-switch-buffer ()
   "Call `other-window' if more than one window is visible.
 Switch to most recent buffer otherwise."
@@ -665,7 +731,9 @@ Switch to most recent buffer otherwise."
       (switch-to-buffer nil)
     (other-window 1)))
 
-;;;###autoload
+#+end_src
+*** crux-kill-other-buffers ()
+#+begin_src emacs-lisp 
 (defun crux-kill-other-buffers ()
   "Kill all buffers but the current one.
 Doesn't mess with special buffers."
@@ -675,7 +743,9 @@ Doesn't mess with special buffers."
      #'kill-buffer
      (delete (current-buffer) (seq-filter #'buffer-file-name (buffer-list))))))
 
-;;;###autoload
+#+end_src
+*** crux-kill-buffer-truename ()
+#+begin_src emacs-lisp 
 (defun crux-kill-buffer-truename ()
   "Kill absolute path of file visited in current buffer."
   (interactive)
@@ -685,7 +755,9 @@ Doesn't mess with special buffers."
         (message "Added %s to kill ring." truename))
     (message "Buffer is not visiting a file.")))
 
-;;;###autoload
+#+end_src
+*** crux-create-scratch-buffer ()
+#+begin_src emacs-lisp 
 (defun crux-create-scratch-buffer ()
   "Create a new scratch buffer."
   (interactive)
@@ -693,13 +765,17 @@ Doesn't mess with special buffers."
     (switch-to-buffer buf)
     (funcall initial-major-mode)))
 
-;;;###autoload
+#+end_src
+*** crux-find-user-init-file ()
+#+begin_src emacs-lisp 
 (defun crux-find-user-init-file ()
   "Edit the `user-init-file', in another window."
   (interactive)
   (find-file-other-window user-init-file))
 
-;;;###autoload
+#+end_src
+*** crux-find-user-custom-file ()
+#+begin_src emacs-lisp 
 (defun crux-find-user-custom-file ()
   "Edit the `custom-file', in another window."
     (interactive)
@@ -707,7 +783,9 @@ Doesn't mess with special buffers."
         (find-file-other-window custom-file)
       (message "No custom file found.")))
 
-;;;###autoload
+#+end_src
+*** crux-find-shell-init-file ()
+#+begin_src emacs-lisp 
 (defun crux-find-shell-init-file ()
   "Edit the shell init file in another window."
   (interactive)
@@ -724,21 +802,27 @@ Doesn't mess with special buffers."
         (find-file-other-window (completing-read "Choose shell init file: " candidates))
       (find-file-other-window (car candidates)))))
 
-;;;###autoload
+#+end_src
+*** crux-upcase-region (beg end)
+#+begin_src emacs-lisp 
 (defun crux-upcase-region (beg end)
   "`upcase-region' when `transient-mark-mode' is on and region is active."
   (interactive "*r")
   (when (use-region-p)
     (upcase-region beg end)))
 
-;;;###autoload
+#+end_src
+*** crux-downcase-region (beg end)
+#+begin_src emacs-lisp 
 (defun crux-downcase-region (beg end)
   "`downcase-region' when `transient-mark-mode' is on and region is active."
   (interactive "*r")
   (when (use-region-p)
     (downcase-region beg end)))
 
-;;;###autoload
+#+end_src
+*** crux-capitalize-region (beg end)
+#+begin_src emacs-lisp 
 (defun crux-capitalize-region (beg end)
   "`capitalize-region' when `transient-mark-mode' is on and region is active."
   (interactive "*r")
@@ -746,7 +830,9 @@ Doesn't mess with special buffers."
     (capitalize-region beg end)))
 
 ;; http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
-;;;###autoload
+#+end_src
+*** crux-ispell-word-then-abbrev (p)
+#+begin_src emacs-lisp 
 (defun crux-ispell-word-then-abbrev (p)
   "Call `ispell-word', then create an abbrev for it.
 With prefix P, create local abbrev.  Otherwise it will
@@ -807,4 +893,63 @@ and the entire buffer (in the absense of a region)."
         (list (point) (line-end-position))))))
 
 (provide 'crux)
-;;; crux.el ends here
+#+end_src
+
+* nice answers
+** Nik heavily commented code
+
+[[https://stackoverflow.com/questions/52121961/emacs-org-mode-insert-text-after-heading-properties][source_link]]
+#+begin_src emacs-lisp 
+(defun my/insert-text-after-heading (text)
+  "Insert TEXT after every heading in the file, skipping property drawers."
+  (interactive "sText to insert: ")
+
+  ;; The Org Element API provides functions that allow you to map over all
+  ;; elements of a particular type and perform modifications. However, as
+  ;; as soon as the buffer is modified the parsed data becomes out of date.
+  ;;
+  ;; Instead, we treat the buffer as text and use other org-element-*
+  ;; functions to parse out important data.
+
+  ;; Use save-excursion so the user's point is not disturbed when this code
+  ;; moves it around.
+  (save-excursion
+    ;; Go to the beginning of the buffer.
+    (goto-char (point-min))
+
+    ;; Use save-match-data as the following code uses re-search-forward,
+    ;; will disturb any regexp match data the user already has.
+    (save-match-data
+
+      ;; Search through the buffer looking for headings. The variable
+      ;; org-heading-regexp is defined by org-mode to match anything
+      ;; that looks like a valid Org heading.
+      (while (re-search-forward org-heading-regexp nil t)
+
+        ;; org-element-at-point returns a list of information about
+        ;; the element the point is on. This includes a :contents-begin
+        ;; property which is the buffer location of the first character
+        ;; of the contents after this headline.
+        ;;
+        ;; Jump to that point.
+        (goto-char (org-element-property :contents-begin (org-element-at-point)))
+
+        ;; Point is now on the first character after the headline. Find out
+        ;; what type of element is here using org-element-at-point.
+        (let ((first-element (org-element-at-point)))
+
+          ;; The first item in the list returned by org-element-at-point
+          ;; says what type of element this is.  See
+          ;; https://orgmode.org/worg/dev/org-element-api.html for details of
+          ;; the different types.
+          ;;
+          ;; If this is a property drawer we need to skip over it. It will
+          ;; an :end property containing the buffer location of the first
+          ;; character after the property drawer. Go there if necessary.
+          (when (eq 'property-drawer (car first-element))
+            (goto-char (org-element-property :end first-element))))
+
+      ;; Point is now after the heading, and if there was a property
+      ;; drawer then it's after that too. Insert the requested text.
+      (insert text "\n\n")))))
+#+end_src
