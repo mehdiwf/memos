@@ -1,0 +1,253 @@
+* packages
+** org mode
+*** org agenda
+**** customize the view
+https://orgmode.org/guide/Custom-Agenda-Views.html
+you can do it nicely if you know how to search well:
+https://orgmode.org/guide/Matching-Tags-and-Properties.html
+
+*** other stuff
+https://orgmode.org/worg/org-tidy.html
+*** org searching
+might be useful for the wiki
+https://orgmode.org/worg/org-tutorials/advanced-searching.html
+
+defining properties
+https://orgmode.org/guide/Properties.html
+
+** org external packages
+*** org-ql
+https://github.com/alphapapa/org-ql
+*** org super agenda
+this seems very good!
+https://github.com/alphapapa/org-super-agenda
+
+*** org roam 
+[[https://github.com/org-roam/org-roam][github]]
+[[https://www.orgroam.com/manual.html][manual]]
+*** org roam bibtex
+https://github.com/org-roam/org-roam-bibtex
+*** org noter
+** other useful packages
+https://github.com/tmalsburg/helm-bibtex
+
+anki like cards
+https://www.leonrische.me/fc/index.html
+
+converting picture equations into latex
+https://github.com/jethrokuan/mathpix.el
+
+* idées
+** org capture
+*** templates 
+**** à implémenter
+:PROPERTIES:
+:item_type:     definition
+:END:
+(org-set-property "item" "definition")
+pour les étudiants comme moi:
+- capture todo
+  - cours (voir comment mettre priorité)
+    - a réécrire/écrire
+    - dig deeper
+    - exercice
+    - pas compris 
+   - 
+
+**** actuel
+#+begin_src emacs-lisp 
+   #+begin_src emacs-lisp
+ (setq org-capture-templates
+ '( 
+
+  ("f" "coFFre à inFormations utiles")
+
+    ("fc" "Citations" entry (file "capture/coffre/coffre_citations.org")
+     "* %^{Nom?} %^g \n%^{source}p\n%i %? " :empty-lines 1)
+
+    ("fm" "Math tricks" entry (file "capture/coffre/coffre_citations.org")
+     "* %? " :empty-lines 1)
+
+    ("fp" "Programmation")
+    ("fpp" "Python" entry (file+headline "capture/coffre/coffre_programmation.org" "python")
+     "* %^{Nom du bout de code?} \n%^{source}p %^{description}p \n#+begin_src python\n%i%?\n#+end_src
+ \n%u" :empty-lines 1)
+    ("fpc" "C++" entry (file+headline "capture/coffre/coffre_programmation.org" "C++")
+     "* %^{Nom du bout de code?} \n%^{source}p %^{description}p \n#+begin_src C++\n%i%?\n#+end_src
+ \n%u" :empty-lines 1)
+    ("fpr" "R" entry (file+headline "capture/coffre/coffre_programmation.org" "R")
+     "* %^{Nom du bout de code?} \n%^{source}p %^{description}p \n#+begin_src R\n%i%?\n#+end_src
+ \n%u" :empty-lines 1)
+    ("fpl" "lisp" entry (file+headline "capture/coffre/coffre_programmation.org" "emacs-lisp")
+     "* %^{Nom du bout de code?} \n%^{source}p %^{description}p \n#+begin_src emacs-lisp\n%i%?\n#+end_src
+ \n%u" :empty-lines 1)
+
+    ("fd" "sujets Divers et variés" entry (file+headline "capture/coffre/coffre_divers.org" "Divers")
+     "* %^{Nom de l'entrée?} %^g \n%^{source}p \n%i%?\n%u" :empty-lines 1)
+
+  ("i" "Idées (moins urgent que TODOs)")
+    ("ip" "Petites idées" entry (file+headline "capture/idees.org" "Petite")
+     "* %?\n%i\n
+ %u" :empty-lines 1)
+    ("ig" "Grosses idées" entry (file+headline "capture/idees.org" "Grosse")
+     "* %?\n%i\n
+ %u" :empty-lines 1)
+
+
+  ("l" "Listes de choses à voir ou sur lesquelles se renseigner")
+    ("lo" "Œuvres" entry (file+headline "capture/coffre/coffre_a_voir.org" "Œuvres")
+     "* %^{Nom de l'œuvre?} \n:PROPERTIES:
+ :importance: %^{importance entre 0 et 5?}
+ :source: %^{source?}
+ :type: %^{type?|none|livre|film|site|article|autre}
+ :END:\n%i%?
+ %u" :empty-lines 1)
+    ("ls" "Sujets/idées/concepts sur lesquels se renseigner" entry (file+headline "capture/coffre/coffre_a_voir.org" "Sujets/Idées/Concepts")
+     "* %^{Nom?} %^g \n:PROPERTIES:
+ :importance: %^{importance entre 0 et 5?}
+ :END:\n%i%?
+ %u" :empty-lines 1)
+
+  ("t" "Todos")
+  ("tc" "Cours" entry (file+headline "capture/todos.org" "Cours")
+   "* TODO %? \n%i\n%a %U" :empty-lines 1)
+  ("to" "Optil" entry (file+headline "capture/todos.org" "Optil")
+   "* TODO %? \n%i\n%a %U" :empty-lines 1)
+  ("tp" "Perso" entry (file+headline "capture/todos.org" "Perso")
+   "* TODO %? \n%i\n%a %U" :empty-lines 1)
+  ("tr" "Regulier, choses qui reviennent souvent comme le loyer" entry (file+headline "capture/todos.org" "Regulier")
+   "* TODO %? \n%i\n%a %U" :empty-lines 1)
+  ("ts" "Social" entry (file+headline "capture/todos.org" "Social")
+   "* TODO %? \n%i\n%a %U" :empty-lines 1)
+  ("ta" "Autres" entry (file+headline "capture/todos.org" "Autres")
+   "* TODO %? \n%i\n%a %U" :empty-lines 1)
+ 
+  ("j" "Journal" entry (file+datetree "capture/journal.org")
+   "* %i%?\nEntered on %U" :empty-lines 1)
+
+  ("a" "Autres" entry (file "capture/autres.org")
+   "* %i%? \n%u" :empty-lines 1)
+
+ ))
+
+  #+end_src
+#+end_src
+*** adding property drawer
+
+#+begin_src emacs-lisp 
+(defun lkr/add-property-with-date-captured ()
+  "Add DATE_CAPTURED property to the current item."
+  (interactive)
+  (org-set-property "TIME_CAPTURED" (format-time-string "%F")))
+
+(add-hook 'org-capture-before-finalize-hook 'add-property-with-date-captured)
+#+end_src
+
+** categorize everything
+*** tag/property an entire file
+to tag every header in a file:
+#+begin_src .org file
+#+FILETAGS: :Peter:Boss:Secret:
+#+end_src
+
+to put a property on every header in a file:
+#+begin_src .org file
+#+property: thing
+#+end_src
+
+***
+*** property in courses
+**** how to 
+C-c C-x p
+to set a property
+maybe there is a way to have default values of properties?
+
+maybe there is a way, with a function, to visit every header of a
+file, and to select if it is either
+definition/property/lemma/theorem... just by pressing d p l or t,
+automatically going in the next header until it's the end.
+
+
+**** interesting properties
+- item_type:
+  - definition
+  - lemma
+  - property
+  - explanation
+  - exercice
+  - demonstration
+  - scheme (or maybe not, or "figure_present: yes", since it's often a
+    figure with something)
+- prerequisite: things needed to understand the course
+- speakers: professors or tdperson
+
+** open any org file in ~
+[[https://www.emacswiki.org/emacs/LocateFilesAnywhere]]
+** pdftools
+comment annoter sur des pdf?
+
+* external ideas/methods
+https://blog.jethro.dev/posts/how_to_take_smart_notes_org/
+https://rgoswami.me/posts/org-note-workflow/
+https://writingcenter.uconn.edu/wp-content/uploads/sites/593/2014/06/How_to_Summarize_a_Research_Article1.pdf
+* cool things unsorted
+https://mathpix.com/
+
+
+* orgmode
+** managing tables
+[[https://sachachua.com/blog/2019/10/python-org-mode-and-writing-org-tables-to-csvs-so-that-i-can-read-them-back/][tables into csv and other stuff]]
+* python
+** managing data
+*** panda
+
+[[https://pandas.pydata.org/docs/getting_started/index.html][tutorials]]
+
+** directory tree to manage experience and scripts
+the file tree can look like that:
+*** experiment1
+**** raw data
+these are not modified, they serve as proof/backup
+**** processing
+***** processable data 
+If you need to process the raw data so that it can become usable in a
+script.
+***** scripts
+****** general functions
+If you need some general functions that you use in many scripts
+****** python scripts
+The scripts that do stuff with your data
+******* raw data processing scripts
+If you need to process the raw data so that it can become usable in a
+script.
+******* processable data scripts
+Scripts that are done and that do the stuff you want
+******* workshop
+Scripts you're working on and are not yet done, or stuff you're testing
+****** output
+To save something in this directory, a script that is for instance in
+processable_data_scripts should save in
+
+=../../output/test_output=
+
+Easy !
+******* test output
+The output of weird stuff you're trying to do in the workshop 
+******* intermediate output
+The output that are interesting, done, but for yourself
+******* report output
+The stuff that is beautiful/correct enough so that you can put it in
+your report.
+
+Like this, you can just copy this entire file in the .tex directory
+and have everything updated when necessary
+
+you can even have a script that searches for every "report output" in
+each "experiment{}".format(experiment_number) and copying it in
+"{}_report_ressources".format(experiment_name) for instance...
+
+******** figures
+Separating figures and tables is nice if you have a large number of them
+******** tables (csv files)
+*** experiment2
+*** experiment3
