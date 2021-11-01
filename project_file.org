@@ -11,6 +11,7 @@ cp /home/mehdi/dossiers/programmation/python/python_ref.org ./
 cp /home/mehdi/dossiers/programmation/emacs_lisp_ref.org ./
 cp /home/mehdi/dossiers/programmation/emacs/memo_org_exterior.org ./
 cp /home/mehdi/dossiers/perso/notes/emacs/org_export_memo/memo_orgmode_latex_export.org ./
+cp /home/mehdi/dossiers/perso/workflow.org ./
 #+end_src
 
 #+RESULTS:
