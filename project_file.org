@@ -19,3 +19,8 @@ cp /home/mehdi/dossiers/perso/workflow.org ./
 * But
 Ce repo est fait pour que Louna ai accès à toutes les petites choses
 qui me facilitent la vie sur ordinateur...  Joyeux anniversaire ! <3
+* Format
+"memo_{}".format(truc) c'est plutot pour des tips et autre de manière
+générale sur un truc, et "{}_ref".format(langage_de_prog) c'est plutôt
+pour plein de lignes de code sur un langage de programmation en
+particulier.
