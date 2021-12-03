@@ -1,46 +1,8 @@
-* packages
-** org mode
-*** org agenda
-**** customize the view
-https://orgmode.org/guide/Custom-Agenda-Views.html
-you can do it nicely if you know how to search well:
-https://orgmode.org/guide/Matching-Tags-and-Properties.html
-
-*** other stuff
-https://orgmode.org/worg/org-tidy.html
-*** org searching
-might be useful for the wiki
-https://orgmode.org/worg/org-tutorials/advanced-searching.html
-
-defining properties
-https://orgmode.org/guide/Properties.html
-
-** org external packages
-*** org-ql
-https://github.com/alphapapa/org-ql
-*** org super agenda
-this seems very good!
-https://github.com/alphapapa/org-super-agenda
-
-*** org roam 
-[[https://github.com/org-roam/org-roam][github]]
-[[https://www.orgroam.com/manual.html][manual]]
-*** org roam bibtex
-https://github.com/org-roam/org-roam-bibtex
-*** org noter
-** other useful packages
-https://github.com/tmalsburg/helm-bibtex
-
-anki like cards
-https://www.leonrische.me/fc/index.html
-
-converting picture equations into latex
-https://github.com/jethrokuan/mathpix.el
-
 * idées
-** org capture
-*** templates 
-**** à implémenter
+** idées perso
+*** org capture
+**** templates 
+***** à implémenter
 :PROPERTIES:
 :item_type:     definition
 :END:
@@ -54,7 +16,7 @@ pour les étudiants comme moi:
     - pas compris 
    - 
 
-**** actuel
+***** actuel
 #+begin_src emacs-lisp 
    #+begin_src emacs-lisp
  (setq org-capture-templates
@@ -132,7 +94,7 @@ pour les étudiants comme moi:
 
   #+end_src
 #+end_src
-*** adding property drawer
+**** adding property drawer
 
 #+begin_src emacs-lisp 
 (defun lkr/add-property-with-date-captured ()
@@ -143,8 +105,8 @@ pour les étudiants comme moi:
 (add-hook 'org-capture-before-finalize-hook 'add-property-with-date-captured)
 #+end_src
 
-** categorize everything
-*** tag/property an entire file
+*** categorize everything
+**** tag/property an entire file
 to tag every header in a file:
 #+begin_src .org file
 #+FILETAGS: :Peter:Boss:Secret:
@@ -156,8 +118,8 @@ to put a property on every header in a file:
 #+end_src
 
 ***
-*** property in courses
-**** how to 
+**** property in courses
+***** how to 
 C-c C-x p
 to set a property
 maybe there is a way to have default values of properties?
@@ -168,7 +130,7 @@ definition/property/lemma/theorem... just by pressing d p l or t,
 automatically going in the next header until it's the end.
 
 
-**** interesting properties
+***** interesting properties
 - item_type:
   - definition
   - lemma
@@ -181,61 +143,121 @@ automatically going in the next header until it's the end.
 - prerequisite: things needed to understand the course
 - speakers: professors or tdperson
 
-** open any org file in ~
-[[https://www.emacswiki.org/emacs/LocateFilesAnywhere]]
-** pdftools
+*** open any org file in ~
+- working version
+#+begin_src emacs-lisp 
+(find-file
+(completing-read "file to open: "
+            (split-string (shell-command-to-string 
+                           "fd . /home/mehdi/ -t f") 
+                           "\n")))
+#+end_src
+
+building blocks:
+#+begin_src emacs-lisp 
+(substring ".test" 1)
+(concat "/e/" "do/")
+(find-file "/home/mehdi/dossiers/truc.txt")
+(split-string "machin 
+truc
+muche" "\n")
+(shell-command-to-string "echo hehe")
+(substring "#hey" 1)
+#+end_src
+
+*** pdftools
 comment annoter sur des pdf?
 
-* external ideas/methods
+** idées/méthodes externes
 https://blog.jethro.dev/posts/how_to_take_smart_notes_org/
 https://rgoswami.me/posts/org-note-workflow/
 https://writingcenter.uconn.edu/wp-content/uploads/sites/593/2014/06/How_to_Summarize_a_Research_Article1.pdf
-* cool things unsorted
+* cool ressources
+** other stuff
 https://mathpix.com/
 
+** useful emacs packages
+*** org mode
+**** org agenda
+***** customize the view
+https://orgmode.org/guide/Custom-Agenda-Views.html
+you can do it nicely if you know how to search well:
+https://orgmode.org/guide/Matching-Tags-and-Properties.html
 
-* orgmode
-** managing tables
+**** other stuff
+https://orgmode.org/worg/org-tidy.html
+**** org searching
+might be useful for the wiki
+https://orgmode.org/worg/org-tutorials/advanced-searching.html
+
+defining properties
+https://orgmode.org/guide/Properties.html
+
+*** org external packages
+**** org-ql
+https://github.com/alphapapa/org-ql
+**** org super agenda
+this seems very good!
+https://github.com/alphapapa/org-super-agenda
+
+**** org roam 
+[[https://github.com/org-roam/org-roam][github]]
+[[https://www.orgroam.com/manual.html][manual]]
+**** org roam bibtex
+https://github.com/org-roam/org-roam-bibtex
+**** org noter
+*** other useful packages
+https://github.com/tmalsburg/helm-bibtex
+
+anki like cards
+https://www.leonrische.me/fc/index.html
+
+converting picture equations into latex
+https://github.com/jethrokuan/mathpix.el
+
+* my workflow
+** orgmode
+*** managing tables
 [[https://sachachua.com/blog/2019/10/python-org-mode-and-writing-org-tables-to-csvs-so-that-i-can-read-them-back/][tables into csv and other stuff]]
-* python
-** managing data
-*** panda
+** python
+*** managing data
+**** panda
 
 [[https://pandas.pydata.org/docs/getting_started/index.html][tutorials]]
 
-** directory tree to manage experience and scripts
+*** directory tree to manage experience and scripts
 the file tree can look like that:
-*** experiment1
-**** raw data
+**** experiment1
+***** raw data
 these are not modified, they serve as proof/backup
-**** processing
-***** processable data 
+***** processing
+****** processable data 
 If you need to process the raw data so that it can become usable in a
 script.
-***** scripts
-****** general functions
+****** scripts
+******* general functions
 If you need some general functions that you use in many scripts
-****** python scripts
+******* python scripts
 The scripts that do stuff with your data
-******* raw data processing scripts
+******** raw data processing scripts
 If you need to process the raw data so that it can become usable in a
 script.
-******* processable data scripts
+******** processable data scripts
 Scripts that are done and that do the stuff you want
-******* workshop
+******** workshop
 Scripts you're working on and are not yet done, or stuff you're testing
-****** output
+******* output
 To save something in this directory, a script that is for instance in
 processable_data_scripts should save in
 
 =../../output/test_output=
 
 Easy !
-******* test output
+******** test output
 The output of weird stuff you're trying to do in the workshop 
-******* intermediate output
+******** intermediate output
 The output that are interesting, done, but for yourself
-******* report output
+******** report output
 The stuff that is beautiful/correct enough so that you can put it in
 your report.
 
@@ -246,8 +268,117 @@ you can even have a script that searches for every "report output" in
 each "experiment{}".format(experiment_number) and copying it in
 "{}_report_ressources".format(experiment_name) for instance...
 
-******** figures
+********* figures
 Separating figures and tables is nice if you have a large number of them
-******** tables (csv files)
-*** experiment2
-*** experiment3
+********* tables (csv files)
+**** experiment2
+**** experiment3
+** other useful soft
+*** Makefile
+**** intro
+10/13/2021
+
+A Makefile is a file called =Makefile=.  Inside, there is a script
+helping to build your project structure, with a lot of tools for file
+creation.
+
+:gcult: It comes from a tool created to help compile compiled program
+languages.
+
+**** how it works
+The =make= command searchs for Makefile file, and if he doesn't find
+it, he searchs for a file with "Makefile" in it.
+
+=make= checks the timestamps of the files and the output file to see
+if there is a dependency that is more recent. If there is, he will
+rebuild the thing.
+
+and it will run the first block it finds in the =makefile=
+**** example
+
+example with Book.txt as the output book, depending on intro.txt,
+chap1.txt, and chap2.txt
+
+#+begin_src makefile
+Book.txt: intro.txt chap1.txt chap2.txt
+	cat intro.txt chap1.txt chap2.txt > Book.txt
+#+end_src
+
+**** silent mode
+if you don't want to have the command printed:
+#+begin_src makefile
+Book.txt: intro.txt chap1.txt chap2.txt
+	@cat intro.txt chap1.txt chap2.txt > Book.txt
+#+end_src
+
+**** the lazy way
+
+equivalent way to write:
+#+begin_src makefile
+Book.txt: intro.txt chap1.txt chap2.txt
+	@cat $^ > Book.txt
+#+end_src
+
+**** macros
+
+equivalent way to write with macros:
+#+begin_src makefile
+TARGET=Book.txt
+CHAPTERS=intro.txt chap1.txt chap2.txt
+
+$(TARGET): $(CHAPTERS)
+	@cat $^ > $(TARGET)
+#+end_src
+
+**** dummies
+if there are no extensions, it will execute the thing always:
+here the operations defined after "clean:" will be executed no matter
+what.
+
+It's like a dummy target file called clean!
+#+begin_src makefile
+PAPER=paper1
+
+$(PAPER).pdf: $(PAPER).tex
+	pdflatex $^
+
+clean:
+	rm -f *.out *aux *bbl *blg *log *toc *.ptb *.tod *.fls *.fdb*_latexmk *.lof
+#+end_src
+
+does the same:
+#+begin_src makefile
+PAPER=paper1
+
+%.pdf: %.tex
+	pdflatex $^
+
+clean:
+	rm -f *.out *aux *bbl *blg *log *toc *.ptb *.tod *.fls *.fdb*_latexmk *.lof
+#+end_src
+
+*** Docker
+**** intro
+A docker is a container. A platform for building, running, and
+shipping applications. Why bother?
+
+Because if it works on your computer, it rarely works in another. Here
+is where Docker shines.
+
+Why not use VM? Docker is way lighter, and uses the pozer of the host
+os! Plus, it starts very quickly.
+**** usual commands
+list of images
+#+begin_src 
+docker images
+docker image ls
+#+end_src
+
+#+begin_src Dockerfile
+docker build -t name-more-mame ./path/to/dockerfile
+docker ps
+docker cp containerID:/path/to/input/file ./path/to/destination
+# to rebuild an image:
+docker rmi --force ImageID/ImageName
+#+end_src
+

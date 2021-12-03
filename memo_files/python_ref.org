@@ -19,8 +19,26 @@ if __name__ == '__main__':
 
 #+end_src
 ** General
-*** importing/loading .py files
-**** Same directory
+*** Files
+**** Listing files
+***** All files
+You can list all the files in a directory and all the files in the
+subdirectories
+
+#+begin_src python :results output
+directory = ...
+data = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser(directory)) for f in fn]
+#+end_src
+
+***** Selecting all files with an extension
+
+#+begin_src python :results output
+# selecting all pdf files
+files_list = [y for x in os.walk(directory) for y in glob(os.path.join(x[0], '*.pdf'))]
+#+end_src
+
+**** importing/loading .py files
+***** Same directory
 
  [[https://www.freecodecamp.org/news/if-name-main-python-example/][How to import .py files and why __main__]]
 
@@ -53,7 +71,7 @@ if __name__ == '__main__':
  #you can also:
  getattr(data, 'a')
  #+end_src
-**** Other directory
+***** Other directory
 from [[https://stackoverflow.com/questions/22955684/how-to-import-py-file-from-another-directory][stack overflow question]]
 #+begin_src python :results output
 import sys
@@ -61,51 +79,60 @@ sys.path.insert(0, 'path/to/your/py_file')
 
 import py_file
 #+end_src
-
-*** Files/Data
-**** Listing files
-***** All files
-You can list all the files in a directory and all the files in the
-subdirectories
-
-#+begin_src python :results output
-directory = ...
-data = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser(directory)) for f in fn]
-#+end_src
-
-***** Selecting all files with an extension
-
-#+begin_src python :results output
-# selecting all pdf files
-files_list = [y for x in os.walk(directory) for y in glob(os.path.join(x[0], '*.pdf'))]
-#+end_src
-
-
 **** Opening
-Ouvrir un fichier de manière safe:
-(Comme ça le fichier se ferme si besoin, en cas d'erreur ou quoi... ça évite beaucoup de bétises.)
+***** open safely
+To open a file safely:
 #+begin_src python :results output
 with open("file.txt","r") as fichier:
     make some stuff
 #+end_src
-
-le "r" peut se remplacer par:
-r for reading – The file pointer is placed at the beginning of the file. This is the default mode.
-r+ Opens a file for both reading and writing. The file pointer will be at the beginning of the file.
-w Opens a file for writing only. Overwrites the file if the file exists. If the file does not exist, creates a new file for writing.
-w+ Opens a file for both writing and reading. Overwrites the existing file if the file exists. If the file does not exist, it creates a new file for reading and writing.
-rb Opens a file for reading only in binary format. The file pointer is placed at the beginning of the file.
-rb+ Opens a file for both reading and writing in binary format.
-wb+ Opens a file for both writing and reading in binary format. Overwrites the existing file if the file exists. If the file does not exist, it creates a new file for reading and writing.
-a Opens a file for appending. The file pointer is at the end of the file if the file exists. That is, the file is in the append mode. If the file does not exist, it creates a new file for writing.
-ab Opens a file for appending in binary format. The file pointer is at the end of the file if the file exists. That is, the file is in the append mode. If the file does not exist, it creates a new file for writing.
-a+ Opens a file for both appending and reading. The file pointer is at the end of the file if the file exists. The file opens in the append mode. If the file does not exist, it creates a new file for reading and writing.
-ab+ Opens a file for both appending and reading in binary format. The file pointer is at the end of the file if the file exists. The file opens in the append mode. If the file does not exist, it creates a new file for reading and writing.
-x open for exclusive creation, failing if the file already exists (Python 3)
-**** Skipping some rows
-
+you ran replace the "r" with:
+***** options
+****** r reading
+The file pointer is placed at the beginning of the file. This is the
+default mode.
+****** r+ both reading and writing
+The file pointer will be at the beginning of the file.
+****** w writing only
+Overwrites the file if the file exists. If the file does not exist,
+creates a new file for writing.
+****** w+ both writing and reading
+Opens a file for both . Overwrites the existing file if the file
+exists. If the file does not exist, it creates a new file for reading
+and writing.
+****** rb reading only in binary format
+The file pointer is placed at the beginning of the file.
+****** rb+ both reading and writing in binary format
+****** wb+ both writing and reading in binary format
+Opens a file for . Overwrites the existing file if the file exists. If
+the file does not exist, it creates a new file for reading and
+writing.
+****** a appending
+Opens a file for appending. The file pointer is at the end of the file
+if the file exists. That is, the file is in the append mode. If the
+file does not exist, it creates a new file for writing.
+****** ab appending in binary format
+The file pointer is at the end of the file if the file exists. That
+is, the file is in the append mode. If the file does not exist, it
+creates a new file for writing.
+****** a+ both appending and reading
+The file pointer is at the end of the file if the file exists. The
+file opens in the append mode. If the file does not exist, it creates
+a new file for reading and writing.
+****** ab+ both appending and reading in binary format
+The file pointer is at the end of the file if the file exists. The
+file opens in the append mode. If the file does not exist, it creates
+a new file for reading and writing.
+****** x exclusive creation
+failing if the file already exists
+  (Python 3)
+***** skipping rows/# commentaries
 #+begin_src python :results output
 extracted_data = np.loadtxt(lines, delimiter=delim, skiprows=1)
+# and also to skip #:
+with open(csv_file_name) as f:
+    lines = (line for line in f if not line.startswith('#'))
+    data = np.genfromtxt(lines, delimiter=',', dtype='object')
 #+end_src
 **** Modify the file
 to write:
@@ -121,7 +148,7 @@ import os
 sum(os.path.getsize(f) for f in os.listdir(directory) if os.path.isfile(f))
 #+end_src
 
-**** exporting files
+**** exporting data
 ***** TODO rewrite this less particular
 #+begin_src python :results output
 import numpy as np
@@ -201,6 +228,60 @@ create_csv_file(crystals_list,'crystals_csv')
 create_csv_file(acier_surfaces_list,'acier_surfaces_csv')
 
 #+end_src
+**** saving and loading data
+***** pickle
+pickle needs to be avoided because it can create dangerous files. [[https://docs.python.org/2/library/pickle.html][warning in doc link]]
+prefer json over pickle (see after)
+#+begin_src python :results output
+import pickle
+  
+# Create a variable
+myvar = [{'This': 'is', 'Example': 2}, 'of',
+         'serialisation', ['using', 'pickle']]
+  
+# Open a file and use dump()
+with open('file.pkl', 'wb') as file: #wb for write binary
+    # A new file will be created
+    pickle.dump(myvar, file)
+#+end_src
+***** json
+****** lists
+#+begin_src python :results output
+#!/usr/bin/env python3
+import json
+
+
+liste = ['trc', 1, 3]
+
+with open('mydata_list.json', 'w') as f:
+    json.dump(liste, f)
+
+with open('mydata_list.json', 'r') as f:
+    loaded_list = json.load(f)
+
+print(loaded_list)
+
+print(np.array(loaded_numpy))
+#+end_src
+****** arrays
+#+begin_src python :results output
+#!/usr/bin/env python3
+import json
+import numpy as np
+
+array_matrix = np.array([[1,3,3],
+                        [0,2,2]])
+
+with open('mydata_numpy.json', 'w') as f:
+    # json doesn't handle arrays, we need to convert it first
+    json.dump(array_matrix.tolist(), f)
+
+with open('mydata_numpy.json', 'r') as f:
+    # and convert it back to array
+    loaded_matrix = np.array(json.load(f))
+    
+print(loaded_matrix)
+#+end_src
 *** Types and their methods
 **** String
 ***** String formating
@@ -229,6 +310,85 @@ print("\n".join(liste))
 : a
 : b
 : c
+
+**** List
+***** Filtering
+ example using filter builtin function:
+ #+begin_src python :results output
+ ext_variables = filter(lambda e: not(e.startswith("__")), ext_variables)
+ #+end_src
+***** Remove
+remove an element from a list
+#+begin_src python :results output
+liste.remove(element)
+#+end_src
+
+***** getting the argument/index of an element
+#+begin_src python :results output
+liste = [1,2]
+print( liste.index(1))
+#+end_src
+
+#+RESULTS:
+: 0
+
+**** Fonctions
+ assert and multi affectation on return
+ #+begin_src python :results output
+ def f(x):
+     assert x != 0,"x should not be equal to zero"
+     return 1/x,x
+ a,b = f(0)
+ #+end_src
+
+ #+RESULTS:
+
+**** Classes
+ Un exemple:
+ #+begin_src python 
+ class Narvalo:
+     def __init__(self, nom, age):
+         self.nom = nom
+         self.age = age
+
+     def get_nom(self):
+         return self.nom
+
+     def get_age(self):
+         return self.age
+
+     def add_age(self, n):
+         self.age += n
+
+
+ class Etudiant(Narvalo):
+     def __init__(self, nom, age, ecole):
+         super().__init__(nom, age)
+         self.ecole = ecole
+
+     def get_ecole(self):
+         return self.ecole
+
+     # On pourrait par exemple définir une autre fonction utilisant une fonction de la classe supérieure,
+     # en écrivant super().fonction(....)
+
+
+ if __name__ == '__main__':
+     Mehdi = Narvalo('Mehdi', 23)
+
+     print(Mehdi.get_age())
+     print(Mehdi.get_nom())
+     print('Je vais ajouter une année')
+     Mehdi.add_age(1)
+     print(Mehdi.get_age())
+
+     Line = Etudiant('Line', 23, 'INSA')
+
+     print('On a créé une classe étudiant, avec dedans {}, qui a {} ans et est à {}'.format(Line.get_nom(), Line.get_age(), Line.get_ecole()))
+
+     if issubclassB(Etudiant, Narvalo):
+         print("Oui Etudiant est une subclasse de Narvalo")
+ #+end_src
 
 **** numpy arrays
 ***** Masks
@@ -314,85 +474,328 @@ gets the indices (rows columns) of elements of tri equal to i
 https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_almost_equal.html
        np.almost equal or something sometimes
        
-**** Classes
- Un exemple:
- #+begin_src python 
- class Narvalo:
-     def __init__(self, nom, age):
-         self.nom = nom
-         self.age = age
-
-     def get_nom(self):
-         return self.nom
-
-     def get_age(self):
-         return self.age
-
-     def add_age(self, n):
-         self.age += n
-
-
- class Etudiant(Narvalo):
-     def __init__(self, nom, age, ecole):
-         super().__init__(nom, age)
-         self.ecole = ecole
-
-     def get_ecole(self):
-         return self.ecole
-
-     # On pourrait par exemple définir une autre fonction utilisant une fonction de la classe supérieure,
-     # en écrivant super().fonction(....)
-
-
- if __name__ == '__main__':
-     Mehdi = Narvalo('Mehdi', 23)
-
-     print(Mehdi.get_age())
-     print(Mehdi.get_nom())
-     print('Je vais ajouter une année')
-     Mehdi.add_age(1)
-     print(Mehdi.get_age())
-
-     Line = Etudiant('Line', 23, 'INSA')
-
-     print('On a créé une classe étudiant, avec dedans {}, qui a {} ans et est à {}'.format(Line.get_nom(), Line.get_age(), Line.get_ecole()))
-
-     if issubclassB(Etudiant, Narvalo):
-         print("Oui Etudiant est une subclasse de Narvalo")
- #+end_src
-
-**** Fonctions
- assert and multi affectation on return
- #+begin_src python :results output
- def f(x):
-     assert x != 0,"x should not be equal to zero"
-     return 1/x,x
- a,b = f(0)
- #+end_src
-
- #+RESULTS:
-
-**** List
-***** Filtering
- example using filter builtin function:
- #+begin_src python :results output
- ext_variables = filter(lambda e: not(e.startswith("__")), ext_variables)
- #+end_src
-***** Remove
-remove an element from a list
+**** pile/"rope" structure
 #+begin_src python :results output
-liste.remove(element)
+from collections import deque
+Q = deque([1, 3, 5])
+print(Q.popleft())
+print(Q.pop())
+Q.append(8)
+print(Q)
+Q.appendleft(10)
+print(Q)
 #+end_src
-
-***** getting the argument/index of an element
+**** pandas
+[[https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html][10 min user guide]]
+df is usually a dataframe
+***** creating data
+****** classic series
 #+begin_src python :results output
-liste = [1,2]
-print( liste.index(1))
+import numpy as np
+import pandas as pd
+
+s = pd.Series([1, 3, 5, np.nan, 6, 8])
+print(s)
 #+end_src
 
 #+RESULTS:
-: 0
+: 0    1.0
+: 1    3.0
+: 2    5.0
+: 3    NaN
+: 4    6.0
+: 5    8.0
+: dtype: float64
 
+****** date range
+#+begin_src python :results output
+import numpy as np
+import pandas as pd
+
+d = pd.date_range("20211201", periods=6, freq="D")
+print(d)
+#+end_src
+
+#+RESULTS:
+: DatetimeIndex(['2021-12-01', '2021-12-02', '2021-12-03', '2021-12-04',
+:                '2021-12-05', '2021-12-06'],
+:               dtype='datetime64[ns]', freq='D')
+
+****** dataframe (abbreviated df)
+******* with a numpy array
+you can "tag" (name) the rows with "index", and the columns with
+"columns"
+#+begin_src python :results output
+import numpy as np
+import pandas as pd
+
+dates = pd.date_range("20130101", periods=6)
+df = pd.DataFrame(np.random.randn(6, 4), index=dates, columns=list("ABCD"))
+print(df)
+#+end_src
+
+#+RESULTS:
+:                    A         B         C         D
+: 2013-01-01  0.208522  0.860985  0.267739  0.193295
+: 2013-01-02 -1.404824  1.352148  0.363108  0.527761
+: 2013-01-03  1.314285 -0.668147 -1.235518 -0.147598
+: 2013-01-04 -0.661288  2.069289  1.177938  0.229748
+: 2013-01-05 -0.974901  1.062613  0.685958 -0.978787
+: 2013-01-06 -1.679077 -1.182110  1.857067 -0.713573
+******* with a dictionnary
+if you have a dictionnary with data that is series like:
+#+begin_src python :results output
+d ={"A": 1.0,
+    "B": pd.Timestamp("20130102"),
+    "C": pd.Series(1, index=list(range(4)), dtype="float32"),
+    "D": np.array([3] * 4, dtype="int32"),
+    "E": pd.Categorical(["test", "train", "test", "train"]),
+    "F": "foo"}
+#+end_src
+meaning that the values of a key are all the same type,
+
+then you can create a dataframe with it, your *series (values of one
+key)* will be *the columns*
+
+#+begin_src python :results output
+import numpy as np
+import pandas as pd
+
+df = pd.DataFrame({"A": 1.0,
+                   "B": pd.Timestamp("20130102"),
+                   "C": pd.Series(1, index=list(range(4)), dtype="float32"),
+                   "D": np.array([3] * 4, dtype="int32"),
+                   "E": pd.Categorical(["test", "train", "test", "train"]),
+                   "F": "foo"})
+print(df)
+#+end_src
+
+#+RESULTS:
+:      A          B    C  D      E    F
+: 0  1.0 2013-01-02  1.0  3   test  foo
+: 1  1.0 2013-01-02  1.0  3  train  foo
+: 2  1.0 2013-01-02  1.0  3   test  foo
+: 3  1.0 2013-01-02  1.0  3  train  foo
+
+******* adding a column to a df
+Setting a new column automatically aligns the data by the indexes.
+#+begin_src python :results output
+import numpy as np
+import pandas as pd
+df = pd.DataFrame(np.random.randn(4, 3),
+                   index=list('abcd'),
+                   columns=list('ABC'))
+
+print(df)
+
+s1 = pd.Series([1,2,4,3],
+               index=list('abdc'))
+df['D'] = s1
+print(df)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+          A         B         C
+a  0.193567  1.192956  0.511580
+b  1.428451  0.291447 -2.245663
+c  0.292541  0.660127  0.506712
+d  0.670781 -0.421005 -1.396154
+          A         B         C  D
+a  0.193567  1.192956  0.511580  1
+b  1.428451  0.291447 -2.245663  2
+c  0.292541  0.660127  0.506712  3
+d  0.670781 -0.421005 -1.396154  4
+#+end_example
+
+***** checking dtypes
+will show the types of the columns
+#+begin_src python :results output
+print(df.dtypes)
+#+end_src
+***** visualizing data
+****** index and columns
+#+begin_src python :results output
+df.index
+df.columns
+
+# to see only the "A" column
+df["A"]
+#+end_src
+****** head, tail
+head, tail, slicing a df...
+#+begin_src python :results output
+df.head()
+df.tail(3)
+#+end_src
+****** summary/overview
+#+begin_src python :results output
+# show a quick summary of your data
+df.describe()
+#+end_src
+***** manipulating data
+****** usual operations
+******* matrix operations
+#+begin_src python :results output
+# you can have the transpose of a data frame
+df.T
+#+end_src
+******* sorting
+#+begin_src python :results output
+# sort dataframe by an index
+df.sort_index(axis=1, ascending=False)
+# sort dataframe by a value
+df.sort_values(by="B")
+
+#+end_src
+****** filtering
+******* masks, slicing with boolean
+******** with loc
+(NA values in a boolean array propagate as False:)
+#+begin_src python :results output
+import numpy as np
+import pandas as pd
+df1 = pd.DataFrame(np.random.randn(4, 2),
+                   index=list('abcd'),
+                   columns=list('AB'))
+
+print(df1)
+print(df1.loc['a'] > 0)
+print(df1.loc[:, df1.loc['a'] > 0])
+#+end_src
+
+#+RESULTS:
+#+begin_example
+          A         B
+a -0.581268 -0.425033
+b -0.081686 -0.970850
+c  0.154261  0.068778
+d  0.414434  0.087521
+A    False
+B    False
+Name: a, dtype: bool
+Empty DataFrame
+Columns: []
+Index: [a, b, c, d]
+0.4187318141646289
+#+end_example
+******** more intuitive
+#+begin_src python :results output
+df[df["A"] > 0]
+df[df > 0]
+#+end_src
+******** isin() select exact matches in a column
+#+begin_src python :results output
+import numpy as np
+import pandas as pd
+df = pd.DataFrame(np.random.randn(4, 3),
+                   index=list('abcd'),
+                   columns=list('ABC'))
+
+df['D'] = ['one', 'two', 'one', 'four']
+print(df)
+print(df[df['D'].isin(['one', 'two'])])
+
+#+end_src
+
+#+RESULTS:
+:           A         B         C     D
+: a -0.999080 -2.150070  0.356084   one
+: b  1.160267  0.821434  0.232759   two
+: c -1.176986 -1.664059  0.234450   one
+: d -2.102014  0.128647  1.666800  four
+:           A         B         C    D
+: a -0.999080 -2.150070  0.356084  one
+: b  1.160267  0.821434  0.232759  two
+: c -1.176986 -1.664059  0.234450  one
+
+******* slicing
+******** like numpy
+#+begin_src python :results output
+import pandas as pd
+import numpy as np
+
+dates = pd.date_range("20130101", periods=4)
+df = pd.DataFrame(np.random.randn(4, 2), index=dates, columns=list("AB"))
+
+print(df)
+print("-----------")
+print(df[0:1])
+#+end_src
+
+#+RESULTS:
+:                    A         B
+: 2013-01-01  0.147111  1.039859
+: 2013-01-02 -0.054329  0.456417
+: 2013-01-03  0.352620  0.124670
+: 2013-01-04  0.874506 -0.254907
+: -----------
+:                    A         B
+: 2013-01-01  0.147111  1.039859
+
+******** with .loc
+you can also use the index and columns, and kinda like numpy
+*both endpoints* are *included*
+#+begin_src python :results output
+import numpy as np
+import pandas as pd
+
+df1 = pd.DataFrame(np.random.randn(6, 4),
+                   index=list('abcdef'),
+                   columns=list('ABCD'))
+print(df1)
+print(df1.loc[['a', 'd'], :])
+print("only A")
+print(df1.loc['d':, 'A'])
+#+end_src
+
+#+RESULTS:
+#+begin_example
+          A         B         C         D
+a  0.537093 -0.102838 -0.434069 -0.021402
+b  1.056246 -0.748348  0.392317  0.996767
+c -0.451420  0.994168 -1.256889 -0.025011
+d  0.778027 -1.447381  2.389844 -0.150592
+e -0.182324  0.638212 -0.676576  0.639734
+f -0.588683  0.605183  0.427892  1.274875
+          A         B         C         D
+a  0.537093 -0.102838 -0.434069 -0.021402
+d  0.778027 -1.447381  2.389844 -0.150592
+only A
+d    0.778027
+e   -0.182324
+f   -0.588683
+Name: A, dtype: float64
+#+end_example
+
+******** with .iloc
+it's like numpy, using the position of passed integers
+#+begin_src python :results output
+# fourth row
+df.iloc[3]
+# 3-4 rows, 0-1 columns
+df.iloc[3:5, 0:2]
+# with list of int
+df.iloc[[1, 2, 4], [0, 2]]
+#+end_src
+****** copying a dataframe
+#+begin_src python :results output
+df.copy()
+#+end_src
+****** to numpy
+it's expensive and creates a dtype = object array if you have
+different data types in your df
+#+begin_src python :results output
+df.to_numpy()
+#+end_src
+****** getting scalars fast
+you can do it with .loc or .iloc, but it's way faster for your
+algorithm to do it with .at and .iat:
+
+for instance
+#+begin_src python :results output
+df.iat[1, 1]
+#+end_src
 *** Python version
 #+begin_src python 
 from platform import python_version
@@ -510,17 +913,6 @@ except ImportError:
     from defaultlib import abc as foo
 #+end_src
 ** Particular
-*** pile/"rope" structure
-#+begin_src python :results output
-from collections import deque
-Q = deque([1, 3, 5])
-print(Q.popleft())
-print(Q.pop())
-Q.append(8)
-print(Q)
-Q.appendleft(10)
-print(Q)
-#+end_src
 *** Progress bar
 #+begin_src python :results output
 import sys
@@ -599,6 +991,380 @@ python3 -m pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1 
  #+begin_src python :results output
  new_vx[i] *= -1
  #+end_src
+
+** Numerical project course (unchecked)
+*** Functional/Object oriented programming
+**** exceptions handling
+#+begin_src python :results output
+# if not everyone has the fast lib
+try:
+    from fastlib import xyz as foo
+except ImportError:
+    from defaultlib import abc as foo
+#+end_src
+
+**** classes
+***** defining a class
+ convention:
+ capital letter for classes, and nothing else
+ #+begin_src python :results output :session
+ class Planet():
+     def __init__(self):
+         self.x = 3
+         self.y = 4
+     def getx(self):
+         return self.x
+
+ class Person():
+     def __init__(self, name, age):
+         self.name = name
+         self.age = age
+
+ earth = Planet()
+ print(earth.getx())
+ # you can also: but it's not a good habit (explanation after)
+ print(earth.x)
+ #+end_src
+
+ #+RESULTS:
+ : 3
+ : 3
+
+ generally, you want to have functions giving the client (the dude
+ printing print(earth.getx())) the information he wants, and not having
+ the client fetch directly in your variables
+
+***** property decorator
+#+begin_src python :results output
+class Planet():
+    def __init__(self):
+        self.x = 3
+        self.y = 4
+    @property
+    def getx(self):
+        return self.x
+#+end_src
+***** subclass
+#+begin_src python :results output :session
+class Planet():
+    def __init__(self):
+        self.x = 3
+        self.y = 4
+    def getx(self):
+        return self.x
+
+class Earth(Planet):
+    def __init__(self):
+        Planet.__init__(self)
+        self.x = 3
+        self.y = 4
+    def getx(self):
+        return self.x
+#+end_src
+
+***** class overloading
+str len in ect... make them work for your class
+print(object_of_your_class)
+#+begin_src python :results output
+class Planet():
+    def __init__(self):
+        self.x = 3
+        self.y = 4
+    def getx(self):
+        return self.x
+    def __str__(self):
+        return "thing"
+my_planet = Planet()
+print(my_planet)
+#+end_src
+
+#+RESULTS:
+: thing
+
+*** conventions in programming
+if you put _ in the beginning of a variable, it's like saying "please
+don't change this name or it will break the code"
+
+all caps: constant of the code
+
+*** pep8
+software you can install via pip:
+- pycodestyle pep 8 (for the code)
+- pydocstyle pep 257 (for the documentation)
+- black (to reformat to pep8)
+
+make your code readable by shortening your program, by calling
+functions that are understandable
+
+*** sphinx to manage documentation
+- comments and documentation explain intentions, not exactly what the code does
+  (if its too obvious)
+- deviation from standard
+- unexpected choices of implementation
+
+renaming variables to have things
+usually, people write documentation like a command: do this, return this...
+dont describe it like 
+this function does... and... ect
+
+#+begin_src python :results output
+def add(x,y):
+    """Return sum."""
+    return x+y
+
+def add(x,y):
+    """Return sum.
+
+    keywords arguments:
+    x the first
+    y the secnod
+
+    """
+    return x+y
+#+end_src
+
+write it for everything!
+
+*** unit testers
+**** ideas
+- fix bugs + make sure they are not reproduced
+- helps with refactoring
+- kinda like a documentation, but it is compiled/interpreted
+
+the idea is to write another code that tests your code
+
+UT frameworks:
+- python: pytest, nose, doctest, unittest
+- c++: catch, google test, boost.test, cppunit,
+
+these frameworks can create Moc objects: commonly used in OO code
+these objects can be difficult things to have irl (like an error, or
+changing the clock of your computer...)
+
+**** examples
+#+begin_src python :results output
+import pytest
+@pytest.mark.parametrize("number, answer", [
+    (1, 1),
+    (2, 2),
+    (3, 6),
+    (4, 24),
+    (10, 3628800),
+])
+
+# dont forget to define factorial
+def test_int_factorials(number, answer):
+    assert(factorial(number) == answer)
+
+def test_another_func(number, answer):
+    assert(another_func(1) == 2)        
+#+end_src
+
+**** test driven development
+when writing code, you can begin to write a lot of tests if you
+already know how your code should behave/what is the goal of your
+code, and run the tests each time you modify something
+
+if you find a bug, write a test so that you make sure you track it
+
+*** argparse
+**** simple stuff
+10/13/2021
+you can have a list of arguments sent from the terminal!
+
+if you have a file script.py in a directory:
+#+begin_src python :results output
+import sys
+print(sys.argv)
+#+end_src
+
+then writing
+#+begin_src bash
+python script.py arg1 arg2 lol
+#+end_src
+will return
+#+begin_src 
+["script.py", "arg1", "arg2", "lol"]
+#+end_src
+
+**** argparse
+use argparse library if you want to do that kind of stuff! NEVER do it by yourself
+
+*** exception handling
+
+we get errors all the time, usually we can see them with error
+outputs. But sometimes, it's difficult to see some of them...
+example: a script which cannot locate a file
+
+**** first example
+#+begin_src python
+number = input("input number")
+try:
+    k = 5//int(number)
+    print(k)
+except:
+    print("Cannot divide by zero")
+
+#+end_src
+**** filtering errors
+#+begin_src python
+# you can also filter by errors
+    number = input("input number")
+try:
+    k = 5//int(number)
+    print(k)
+except ZeroDivisonError:
+    print("Cannot divide by zero")
+
+#+end_src
+
+**** other options (else/finally)
+#+begin_src python
+    
+# you can also filter by errors
+    number = input("input number")
+try:
+    k = 5//int(number)
+    print(k)
+except ZeroDivisonError:
+    print("Cannot divide by zero")
+else:
+    # executes if everything works perfectly
+    print('it succeeded')
+finally:
+    # executes no matter what happens
+    print('end')
+
+#+end_src
+**** printing errors as you want
+#+begin_src python
+    number = input("input number")
+try:
+    k = 5//int(number)
+    print(k)
+except ZeroDivisonError:
+    print("Cannot divide by zero")
+# you can even print each Exception you have:
+except Exception as e:
+    print("print {}".format(e))
+#+end_src
+
+**** examples
+example: adding things to a list, try for each item
+if exception
+print " i can't print this item" item
+
+*** file handling
+**** problem
+if you leave a file opened, it can slow down your computer or cause problems
+**** solution
+don't
+#+begin_src python :results output
+f = open('file','r')
+#+end_src
+
+do :
+#+begin_src python :results output
+with open('file', 'r') as file:
+#+end_src
+so that the file is properly closed when you finish your stuff.
+*** packaging
+**** general knowledge
+
+pip uses PyPI
+npm is like PyPI but for java
+**** how to share our codes
+
+if you want to share:
+put your .py file in a src file
+
+#+begin_src python :results output
+
+
+from setuptools import setup
+
+setup(
+    name = "mypyfile", # name of package to put after pip install
+    version = "0.0.1", #0.0.x generally means it's unstable
+    description = "descrip",
+    #CF SLIDES
+#+end_src
+
+**** before uploading
+
+don't forget to gitignore things and put classifiers so that people
+can find your package easily
+
+plus, you need to put documentation!!
+
+**** testing
+
+You NEED tests, and put them as "extras" (check slides)
+
+to publish, you also need to put your email, phone number, and git
+repo so that people can contact you
+
+you have "check manifest" thing to help you complete everything (check
+slide just before "Publish!"
+
+there is also "twine" to publish stuff
+
+**** there is also some things helping you
+
+cookiecutter
+you just need to answer a bunch of questions and it will help you to
+setup your package
+
+*** license
+
+It depends on your project. But it's necessary to ask yourself some
+questions for your code:
+
+do I want it to be
+
+by default:
+exclusive copyright ! Nobody can use it, copy it, distribute,
+modify...
+
+if you put things on github: depends of terms of service
+
+if you find code without license : don't use the software! find
+alternatives
+on github: open an issue requesting a license
+
+choosealicense.com
+*** parallel computing
+
+there are software to do that... don't learn everything from scratch
+
+learning to do it from 0 to something perfect: ~6 month if very lucky
+and with an expert
+
+for instance
+"dask" check the tutorial it's super good!!!
+"RAPIDS"
+
+numerical recipes book
+
+two possible things to try maybe?
+f2py
+or scython (but poor doc)
+if there are no way to parrallelize your program!!
+
+openMP handbook: well written
+
+ali citation
+- expert
+- good teacher
+- wants to teach
+- can teach
+
+also: if you want to make your code faster, USE TESTS!!!!!!!!!!! You
+might create errors and it would be very easy to find them with tests
+
+one time it took Ali 2 months to solve a problem like this...
+
+Binder: useful to test things
 
 ** problèmes
 *** liste qui se remplit de la même val

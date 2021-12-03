@@ -82,6 +82,8 @@ git restore file_to_undo_changes
 git status
 # seeing the history of changes
 git log
+# seeing summarized log
+git log --pretty=oneline
 # check unstaged changes from last commit
 git diff
 
@@ -135,6 +137,52 @@ git merge your_branch_name
 git checkout your_branch_name 
 # then "push" your modifications
 git push -u origin your_branch_name 
+** tags
+[[https://git-scm.com/book/en/v2/Git-Basics-Tagging][source]]
+*** listing/searching tags
+# list all tags
+git tag
+# to search a regexp in the tag list
+git tag -l "v1.2*"
+# show/see tag information with tag name
+git show v1.4
+*** create tag for the current commit
+# create an *annotated* tag (v1.4 is the tag name)
+git tag -a v1.4 -m "my message for the tag"
+# create a lightweight tag 
+git tag v1.4-lw
+
+*** create tag for an older commit
+# you can check the commits like this
+git log --pretty=oneline
+# and then create the tag with the uuid (or a sufficient part of it)
+git tag -a v1.2 9fceb02
+*** deleting tags
+# deleting a tag with its name:
+git tag -d v1.4
+# remark for remote servers
+Note that this does not remove the tag from any remote servers. There
+are two common variations for deleting a tag from a remote server.
+
+The first variation is git push <remote> :refs/tags/<tagname>
+
+$ git push origin :refs/tags/v1.4-lw
+To /git@github.com:schacon/simplegit.git
+ - [deleted]         v1.4-lw
+
+The way to interpret the above is to read it as the null value before
+the colon is being pushed to the remote tag name, effectively deleting
+it.
+
+The second (and more intuitive) way to delete a remote tag is with:
+
+$ git push origin --delete <tagname>
+
+
+
+*** pushing tags
+# to push your commits AND your tags:
+git push origin --tags
 * remote repositories
 to add a reference point (an online repo you will use a lot)
 for instance
@@ -148,4 +196,95 @@ original project repository. You can only read from this remote.
 It also adds "origin", pointing to your remote branch where your fork
 lives. You can read and write stuff to this remote.
 
+
+
+* Numerical project course
+** commit message
+pay attention to message size, and don't crank a lot of things (typo,
+bugfix, ...) in one commit
+
+:tip: don't crank a lot of things (typo, bugfix, ...) in one commit
+
+** how to ignore some files
+.gitignore file can help for that
+you can add files to this file, but also 
+
+:tip: use 'git status -s' to have a short version
+
+useful ressources!
+https://github.com/github/gitignore
+
+** log/diff
+# setting your diff visual tool
+git config --global diff.tool <the tool you wanna use>
+# get 3 last commits
+git log -3 
+# get detailed info logs
+git log -p
+# filter
+git log --author="ali"
+# having all the info in one line
+git log --oneline
+# greping smartly logs
+git log --grep="word"
+# show a specific commit (you don't need to copy all the uuid, just a part of it)
+git show b3269f3
+# see the differences between two commits
+git diff 67865..8734
+# 
+git log 
+
+** branches
+
+the main/master branch is always the branch that is presentable to
+your supervisors/..
+
+you have a developping branch, where you make changes that can be very
+deep in your project
+
+HEAD is where your last commit is
+
+# see branches you have on the remote repo
+git branch --remote
+# create newbranch from the last commit
+git branch new_branch
+# change branch 
+git checkout new_branch
+git switch new_branch
+# to create a branch from the key 23hjsd7s
+git branch other_branch 23hjsd7s
+# rename the branch you are on
+git branch -m new_name
+# rename a branch you are not on
+git branch -m old_name new_name
+
+*** merging
+# you need to switch to the branch you want to merge in, and merge 
+git switch new_branch
+git merge dev_branch
+*** rebasing
+you may want to rebase a branch, to have all commits in one
+branch. But it may be annoying for the team!
+*** collabs
+on newbranch
+commit
+switch to master
+pull
+switch to newbranch
+merge master to newbranch
+talk to other to sort conflict
+switch to master and push
+
+:tip: ALWAYS fix merging problems in your personal branch
+** tags
+# add tags to commits
+git tag v2.5 1b21d63ff
+
+** remote repo
+# after setting things up with 
+git push -u origin
+
+# and then:
+git push
+git pull
 

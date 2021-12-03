@@ -3,24 +3,24 @@ updates the files
 #+begin_src bash
 cd /home/mehdi/dossiers/perso/projets/memos_git/memo_files/
 rm /home/mehdi/dossiers/perso/projets/memos_git/memo_files/*
+
 cp /home/mehdi/dossiers/perso/notes/memo_git.org ./
 cp /home/mehdi/dossiers/perso/notes/memo_linux.org ./
-cp /home/mehdi/dossiers/programmation/memo_prog.org ./
 cp /home/mehdi/dossiers/perso/notes/emacs/memo_emacs.org ./
+cp /home/mehdi/dossiers/perso/notes/emacs/org_export_memo/memo_orgmode_latex_export.org ./
+cp /home/mehdi/dossiers/perso/workflow.org ./
+
+cp /home/mehdi/dossiers/programmation/memo_prog.org ./
 cp /home/mehdi/dossiers/programmation/python/python_ref.org ./
 cp /home/mehdi/dossiers/programmation/emacs_lisp_ref.org ./
 cp /home/mehdi/dossiers/programmation/emacs/memo_org_exterior.org ./
-cp /home/mehdi/dossiers/perso/notes/emacs/org_export_memo/memo_orgmode_latex_export.org ./
-cp /home/mehdi/dossiers/perso/workflow.org ./
 #+end_src
 
 #+RESULTS:
 
 * But
-Ce repo est fait pour que Louna ai accès à toutes les petites choses
-qui me facilitent la vie sur ordinateur...  Joyeux anniversaire ! <3
-* Format
-"memo_{}".format(truc) c'est plutot pour des tips et autre de manière
-générale sur un truc, et "{}_ref".format(langage_de_prog) c'est plutôt
-pour plein de lignes de code sur un langage de programmation en
-particulier.
+Originalement pour partager mes trouvailles avec Louna, mais voilà,
+c'est pour tout le monde maintenant.
+* Disclaimer
+parfois c'est en anglais, parfois en français... par contre si vous
+voyez une erreur, n'hésitez pas à la signaler
