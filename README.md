@@ -4,4 +4,4 @@ souvent utiles
 
 # disclaimer
 parfois c'est en anglais, parfois en français... par contre si vous
-voyez une *erreur*, n'hésitez pas à la signaler!
+voyez une **erreur**, n'hésitez pas à la signaler!
