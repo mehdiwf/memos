@@ -488,6 +488,8 @@ print(Q)
 **** pandas
 [[https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html][10 min user guide]]
 df is usually a dataframe
+stopped writing at:
+[[https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html#operations][link]]
 ***** creating data
 ****** classic series
 #+begin_src python :results output
@@ -608,6 +610,11 @@ c  0.292541  0.660127  0.506712  3
 d  0.670781 -0.421005 -1.396154  4
 #+end_example
 
+****** missing data (NaN)
+non attribuated values:
+#+begin_src python :results output
+np.nan
+#+end_src
 ***** checking dtypes
 will show the types of the columns
 #+begin_src python :results output
@@ -648,9 +655,9 @@ df.sort_index(axis=1, ascending=False)
 df.sort_values(by="B")
 
 #+end_src
-****** filtering
-******* masks, slicing with boolean
-******** with loc
+******* filtering/slicing
+******** masks, slicing with boolean
+********* with loc
 (NA values in a boolean array propagate as False:)
 #+begin_src python :results output
 import numpy as np
@@ -679,12 +686,12 @@ Columns: []
 Index: [a, b, c, d]
 0.4187318141646289
 #+end_example
-******** more intuitive
+********* more intuitive
 #+begin_src python :results output
 df[df["A"] > 0]
 df[df > 0]
 #+end_src
-******** isin() select exact matches in a column
+********* isin() select exact matches in a column
 #+begin_src python :results output
 import numpy as np
 import pandas as pd
@@ -709,8 +716,13 @@ print(df[df['D'].isin(['one', 'two'])])
 : b  1.160267  0.821434  0.232759  two
 : c -1.176986 -1.664059  0.234450  one
 
-******* slicing
-******** like numpy
+********* changing particular values
+to change the positive values by multiplying them by -1
+#+begin_src python :results output
+df2[df2 > 0] = -df2
+#+end_src
+******** slicing
+********* like numpy
 #+begin_src python :results output
 import pandas as pd
 import numpy as np
@@ -733,7 +745,7 @@ print(df[0:1])
 :                    A         B
 : 2013-01-01  0.147111  1.039859
 
-******** with .loc
+********* with .loc
 you can also use the index and columns, and kinda like numpy
 *both endpoints* are *included*
 #+begin_src python :results output
@@ -768,7 +780,7 @@ f   -0.588683
 Name: A, dtype: float64
 #+end_example
 
-******** with .iloc
+********* with .iloc
 it's like numpy, using the position of passed integers
 #+begin_src python :results output
 # fourth row
@@ -778,6 +790,42 @@ df.iloc[3:5, 0:2]
 # with list of int
 df.iloc[[1, 2, 4], [0, 2]]
 #+end_src
+******* statistics
+******** mean
+#+begin_src python :results output
+df.mean()
+#+end_src
+****** managing nan
+******* filtering rows with nan
+to drop any row with a nan in it
+#+begin_src python :results output
+df1.dropna(how="any")
+#+end_src
+******* filling nan
+#+begin_src python :results output
+df1.fillna(value=5)
+#+end_src
+******* boolean mask nan
+#+begin_src python :results output
+pd.isna(df1)
+#+end_src
+****** managing columns/indexing
+******* reindex
+returns a copy of the dataframe
+it's to change the ORDER
+#+begin_src python :results output
+index_list = list('abcd')
+column_list = list('acdb')
+df.reindex(index=index_list, columns=column_list)
+#+end_src
+
+to really change the index:
+#+begin_src python :results output
+df.index = list('ABCE')
+# or
+df.columns = list('ABCE')
+#+end_src
+
 ****** copying a dataframe
 #+begin_src python :results output
 df.copy()
@@ -795,6 +843,7 @@ algorithm to do it with .at and .iat:
 for instance
 #+begin_src python :results output
 df.iat[1, 1]
+df.at['a','A'] = 0
 #+end_src
 *** Python version
 #+begin_src python 

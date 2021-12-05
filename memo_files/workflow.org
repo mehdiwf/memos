@@ -219,6 +219,53 @@ https://github.com/jethrokuan/mathpix.el
 ** orgmode
 *** managing tables
 [[https://sachachua.com/blog/2019/10/python-org-mode-and-writing-org-tables-to-csvs-so-that-i-can-read-them-back/][tables into csv and other stuff]]
+*** importing self updating csv files
+There is a way to import csv file as table in org mode!
+Like this, you just need to execute all code blocks
+
+(C-c C-v C-b org-babel-execute-buffer)
+
+To update all the tables!! You can even have a bash code block that
+copies the tables in their origin directory to the .org directory like
+so:
+
+#+begin_src bash
+cp sourcefile outputfile
+#+end_src
+
+(look at [[https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-python.html][this tutorial]] to understand everything done here)
+
+#+name: panda2org
+#+begin_src python :var df="df" :exports none
+  return f"return tabulate({df}, headers={df}.columns, tablefmt='orgtbl')"
+#+end_src
+
+#+header: :prologue from tabulate import tabulate
+#+header: :noweb strip-export
+#+begin_src python :results value raw :exports results
+  import pandas as pd
+  filename = "/home/mehdi/dossiers/ilm/mesures_brevet_condense/rapport/atelier/archive/metals_csv_young.csv"
+  df = pd.read_csv(filename, index_col=0)
+
+  <<panda2org("df")>>
+#+end_src
+
+#+RESULTS:
+|                | Module de Young | Intervalle de confiance (95%) |
+|----------------+-----------------+-------------------------------|
+| acier 304-L    |           169.3 |                             9 |
+| aluminium AG5  |            69.4 |                           3.3 |
+| aluminium AU4G |            67.2 |                           4.2 |
+| cuivre         |             103 |                            15 |
+| laiton         |            94.6 |                           8.8 |
+| nickel         |             218 |                            14 |
+| titane T6AV    |           116.9 |                           4.4 |
+| tantale        |             192 |                            16 |
+| molybdène      |             300 |                           120 |
+| fonte          |           151.7 |                           9.1 |
+
+\newpage
+
 ** python
 *** managing data
 **** panda
@@ -227,13 +274,13 @@ https://github.com/jethrokuan/mathpix.el
 
 *** directory tree to manage experience and scripts
 the file tree can look like that:
-**** experiment1
+(I prefer the second way)
+**** first_way:experiment folder
 ***** raw data
 these are not modified, they serve as proof/backup
 ***** processing
-****** processable data 
-If you need to process the raw data so that it can become usable in a
-script.
+****** processed_data
+The output of pre_processing scripts if needed
 ****** scripts
 ******* general functions
 If you need some general functions that you use in many scripts
@@ -271,8 +318,79 @@ each "experiment{}".format(experiment_number) and copying it in
 ********* figures
 Separating figures and tables is nice if you have a large number of them
 ********* tables (csv files)
-**** experiment2
-**** experiment3
+***** pre_processing
+if needed, takes the raw data and process it to make it easier to use
+
+**** second_way
+if you want to do it:
+#+begin_src bash
+touch Makefile
+touch dir_variables.py
+mkdir raw_data_experiment
+mkdir pre_processing/output/ -p
+mkdir pre_processing/scripts/ -p
+mkdir pre_processing/input/ -p
+mkdir processing/output/ -p
+mkdir processing/scripts/ -p
+mkdir processing/input/ -p
+mkdir post_processing/output/ -p
+mkdir post_processing/scripts/ -p
+mkdir post_processing/input/ -p
+#+end_src
+dir_variables.py
+***** raw_data_experiment
+The raw data of your experiment.
+
+It's way easier to deal with if you write the names in a scriptable
+way. For instance:
+
+I had samples, and for each sample, I had to do two measurements:
+- theta R
+- theta L
+so I named my files like this:
+(with sample the name of the sample)
+
+sample_R_.csv
+sample_L_.csv
+
+like this, I can select the theta_R file with the condition
+("_R_" in filename)
+***** pre_processing
+processing the raw data so that it's easier to use in a script
+(putting everything in a dataframe and saving as json and csv)
+****** output
+****** scripts
+****** input
+eventually if you have parameters/metadata or something else...
+***** processing
+****** output
+the output of your script (/can/ be divided in folders like:)
+- test_output
+  if you wanna test things
+- report_output
+  for your report
+- interesting_output
+  for anything not for the processing but still interesting
+- archive
+  if you wanna keep some valuable things but that you don't use
+****** scripts
+your scripts (can be divided in folders like:)
+- general_functions
+- processing1
+- processing2
+- ...
+i usually just have:
+- processing_script.py
+- functions.py
+in this folder
+****** input
+***** post_processing
+in case you need post processing to make it more pleasant to see, or
+just nice for your report
+(graphs, csv files with beautiful columns...)
+****** output
+****** scripts
+****** input
 ** other useful soft
 *** Makefile
 **** intro

@@ -140,7 +140,7 @@ you can also have tables
 | 1 | 3 |    4 |
 | 3 | 2 | 1.32 |
 
-** importing tables
+** importing csv tables
 There is a way to import csv file as table in org mode!
 Like this, you just need to execute all code blocks
 
@@ -156,197 +156,23 @@ cp sourcefile outputfile
 
 (look at [[https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-python.html][this tutorial]] to understand everything done here)
 
-#+name: pd2org
-#+begin_src python :var df="df" :exports none :results silent
-return f"print(tabulate({df}, headers={df}.columns, tablefmt='orgtbl'))"
+#+name: panda2org
+#+begin_src python :var df="df" :exports none
+  return f"return tabulate({df}, headers={df}.columns, tablefmt='orgtbl')"
 #+end_src
 
+#+header: :prologue from tabulate import tabulate
 #+header: :noweb strip-export
-#+begin_src python :results output raw :exports results
-from tabulate import tabulate
-import pandas as pd
-filename = "/home/mehdi/dossiers/ilm/rapport/atelier/donnees/donnees_formatees.csv"
-df = pd.read_csv(filename, index_col=0)
+#+begin_src python :results value raw :exports results
+  import pandas as pd
+  filename = "/home/mehdi/dossiers/ilm/mesures_brevet_condense/rapport/atelier/archive/metals_csv_young.csv"
+  df = pd.read_csv(filename, index_col=0)
 
-print('#+header thing if you want')
-print(<<pd2org("df")>>)
+  <<panda2org("df")>>
 #+end_src
-
-#+RESULTS:
-#+header thing if you want
-|                   |    "young coefficient" |    "young error 95%" |    "poisson" |    "poisson error 95%"  |
-|-------------------+------------------------+----------------------+--------------+-------------------------|
-| acier_polie       |                  169.3 |                  9   |       0.273  |                  0.017  |
-| acier_ecrouie     |                  172   |                 16   |       0.266  |                  0.03   |
-| acier_striee_para |                  177.9 |                  5.4 |       0.2961 |                  0.0087 |
-| acier_striee_perp |                  201   |                 11   |       0.258  |                  0.021  |
-| aluminium_AG5     |                   69.4 |                  3.3 |       0.292  |                  0.014  |
-| aluminium_AUG4    |                   67.2 |                  4.2 |       0.331  |                  0.012  |
-| cuivre            |                  103   |                 15   |       0.332  |                  0.027  |
-| laiton            |                   94.6 |                  8.8 |       0.35   |                  0.015  |
-| molybdene         |                  300   |                120   |       0.19   |                  0.19   |
-| nickel            |                  218   |                 14   |       0.302  |                  0.016  |
-| tantale           |                  192   |                 16   |       0.339  |                  0.017  |
-| titane            |                  116.9 |                  4.4 |       0.308  |                  0.011  |
-| avec_ito          |                   72.7 |                  2.9 |       0.207  |                  0.02   |
-| sans_ito          |                   74.4 |                  1.5 |       0.174  |                  0.014  |
-| LiNbO3_face_      |                  148.5 |                  7.6 |       0.328  |                  0.011  |
-| LiNbO3_autreface_ |                  153.1 |                  8.9 |       0.328  |                  0.013  |
-| LGT               |                  142.3 |                  8.9 |       0.239  |                  0.03   |
-| ZrO2              |                  254   |                 13   |       0.21   |                  0.026  |
-| eutectique_s1     |                  296   |                 30   |       0.165  |                  0.067  |
-| eutectique_s2     |                  309   |                 26   |       0.178  |                  0.052  |
-| eutectique_s3     |                  298   |                 17   |       0.12   |                  0.051  |
-| eutectique_s4     |                  276   |                 21   |       0.229  |                  0.034  |
-| eutectique_s5     |                  279   |                 26   |       0.212  |                  0.041  |
-| fonte             |                  151.7 |                  9.1 |       0.295  |                  0.017  |
-None
-#+header thing if you want
-|                   |    "young coefficient" |    "young error 95%" |    "poisson" |    "poisson error 95%"  |
-|-------------------+------------------------+----------------------+--------------+-------------------------|
-| acier_polie       |                  169.3 |                  9   |       0.273  |                  0.017  |
-| acier_ecrouie     |                  172   |                 16   |       0.266  |                  0.03   |
-| acier_striee_para |                  177.9 |                  5.4 |       0.2961 |                  0.0087 |
-| acier_striee_perp |                  201   |                 11   |       0.258  |                  0.021  |
-| aluminium_AG5     |                   69.4 |                  3.3 |       0.292  |                  0.014  |
-| aluminium_AUG4    |                   67.2 |                  4.2 |       0.331  |                  0.012  |
-| cuivre            |                  103   |                 15   |       0.332  |                  0.027  |
-| laiton            |                   94.6 |                  8.8 |       0.35   |                  0.015  |
-| molybdene         |                  300   |                120   |       0.19   |                  0.19   |
-| nickel            |                  218   |                 14   |       0.302  |                  0.016  |
-| tantale           |                  192   |                 16   |       0.339  |                  0.017  |
-| titane            |                  116.9 |                  4.4 |       0.308  |                  0.011  |
-| avec_ito          |                   72.7 |                  2.9 |       0.207  |                  0.02   |
-| sans_ito          |                   74.4 |                  1.5 |       0.174  |                  0.014  |
-| LiNbO3_face_      |                  148.5 |                  7.6 |       0.328  |                  0.011  |
-| LiNbO3_autreface_ |                  153.1 |                  8.9 |       0.328  |                  0.013  |
-| LGT               |                  142.3 |                  8.9 |       0.239  |                  0.03   |
-| ZrO2              |                  254   |                 13   |       0.21   |                  0.026  |
-| eutectique_s1     |                  296   |                 30   |       0.165  |                  0.067  |
-| eutectique_s2     |                  309   |                 26   |       0.178  |                  0.052  |
-| eutectique_s3     |                  298   |                 17   |       0.12   |                  0.051  |
-| eutectique_s4     |                  276   |                 21   |       0.229  |                  0.034  |
-| eutectique_s5     |                  279   |                 26   |       0.212  |                  0.041  |
-| fonte             |                  151.7 |                  9.1 |       0.295  |                  0.017  |
-None
-#+header thing if you want
-|                   |    "young coefficient" |    "young error 95%" |    "poisson" |    "poisson error 95%"  |
-|-------------------+------------------------+----------------------+--------------+-------------------------|
-| acier_polie       |                  169.3 |                  9   |       0.273  |                  0.017  |
-| acier_ecrouie     |                  172   |                 16   |       0.266  |                  0.03   |
-| acier_striee_para |                  177.9 |                  5.4 |       0.2961 |                  0.0087 |
-| acier_striee_perp |                  201   |                 11   |       0.258  |                  0.021  |
-| aluminium_AG5     |                   69.4 |                  3.3 |       0.292  |                  0.014  |
-| aluminium_AUG4    |                   67.2 |                  4.2 |       0.331  |                  0.012  |
-| cuivre            |                  103   |                 15   |       0.332  |                  0.027  |
-| laiton            |                   94.6 |                  8.8 |       0.35   |                  0.015  |
-| molybdene         |                  300   |                120   |       0.19   |                  0.19   |
-| nickel            |                  218   |                 14   |       0.302  |                  0.016  |
-| tantale           |                  192   |                 16   |       0.339  |                  0.017  |
-| titane            |                  116.9 |                  4.4 |       0.308  |                  0.011  |
-| avec_ito          |                   72.7 |                  2.9 |       0.207  |                  0.02   |
-| sans_ito          |                   74.4 |                  1.5 |       0.174  |                  0.014  |
-| LiNbO3_face_      |                  148.5 |                  7.6 |       0.328  |                  0.011  |
-| LiNbO3_autreface_ |                  153.1 |                  8.9 |       0.328  |                  0.013  |
-| LGT               |                  142.3 |                  8.9 |       0.239  |                  0.03   |
-| ZrO2              |                  254   |                 13   |       0.21   |                  0.026  |
-| eutectique_s1     |                  296   |                 30   |       0.165  |                  0.067  |
-| eutectique_s2     |                  309   |                 26   |       0.178  |                  0.052  |
-| eutectique_s3     |                  298   |                 17   |       0.12   |                  0.051  |
-| eutectique_s4     |                  276   |                 21   |       0.229  |                  0.034  |
-| eutectique_s5     |                  279   |                 26   |       0.212  |                  0.041  |
-| fonte             |                  151.7 |                  9.1 |       0.295  |                  0.017  |
-None
-#header thing if you want
-|                   |    "young coefficient" |    "young error 95%" |    "poisson" |    "poisson error 95%"  |
-|-------------------+------------------------+----------------------+--------------+-------------------------|
-| acier_polie       |                  169.3 |                  9   |       0.273  |                  0.017  |
-| acier_ecrouie     |                  172   |                 16   |       0.266  |                  0.03   |
-| acier_striee_para |                  177.9 |                  5.4 |       0.2961 |                  0.0087 |
-| acier_striee_perp |                  201   |                 11   |       0.258  |                  0.021  |
-| aluminium_AG5     |                   69.4 |                  3.3 |       0.292  |                  0.014  |
-| aluminium_AUG4    |                   67.2 |                  4.2 |       0.331  |                  0.012  |
-| cuivre            |                  103   |                 15   |       0.332  |                  0.027  |
-| laiton            |                   94.6 |                  8.8 |       0.35   |                  0.015  |
-| molybdene         |                  300   |                120   |       0.19   |                  0.19   |
-| nickel            |                  218   |                 14   |       0.302  |                  0.016  |
-| tantale           |                  192   |                 16   |       0.339  |                  0.017  |
-| titane            |                  116.9 |                  4.4 |       0.308  |                  0.011  |
-| avec_ito          |                   72.7 |                  2.9 |       0.207  |                  0.02   |
-| sans_ito          |                   74.4 |                  1.5 |       0.174  |                  0.014  |
-| LiNbO3_face_      |                  148.5 |                  7.6 |       0.328  |                  0.011  |
-| LiNbO3_autreface_ |                  153.1 |                  8.9 |       0.328  |                  0.013  |
-| LGT               |                  142.3 |                  8.9 |       0.239  |                  0.03   |
-| ZrO2              |                  254   |                 13   |       0.21   |                  0.026  |
-| eutectique_s1     |                  296   |                 30   |       0.165  |                  0.067  |
-| eutectique_s2     |                  309   |                 26   |       0.178  |                  0.052  |
-| eutectique_s3     |                  298   |                 17   |       0.12   |                  0.051  |
-| eutectique_s4     |                  276   |                 21   |       0.229  |                  0.034  |
-| eutectique_s5     |                  279   |                 26   |       0.212  |                  0.041  |
-| fonte             |                  151.7 |                  9.1 |       0.295  |                  0.017  |
-None
-#header thing if you want
-|                   |    "young coefficient" |    "young error 95%" |    "poisson" |    "poisson error 95%"  |
-|-------------------+------------------------+----------------------+--------------+-------------------------|
-| acier_polie       |                  169.3 |                  9   |       0.273  |                  0.017  |
-| acier_ecrouie     |                  172   |                 16   |       0.266  |                  0.03   |
-| acier_striee_para |                  177.9 |                  5.4 |       0.2961 |                  0.0087 |
-| acier_striee_perp |                  201   |                 11   |       0.258  |                  0.021  |
-| aluminium_AG5     |                   69.4 |                  3.3 |       0.292  |                  0.014  |
-| aluminium_AUG4    |                   67.2 |                  4.2 |       0.331  |                  0.012  |
-| cuivre            |                  103   |                 15   |       0.332  |                  0.027  |
-| laiton            |                   94.6 |                  8.8 |       0.35   |                  0.015  |
-| molybdene         |                  300   |                120   |       0.19   |                  0.19   |
-| nickel            |                  218   |                 14   |       0.302  |                  0.016  |
-| tantale           |                  192   |                 16   |       0.339  |                  0.017  |
-| titane            |                  116.9 |                  4.4 |       0.308  |                  0.011  |
-| avec_ito          |                   72.7 |                  2.9 |       0.207  |                  0.02   |
-| sans_ito          |                   74.4 |                  1.5 |       0.174  |                  0.014  |
-| LiNbO3_face_      |                  148.5 |                  7.6 |       0.328  |                  0.011  |
-| LiNbO3_autreface_ |                  153.1 |                  8.9 |       0.328  |                  0.013  |
-| LGT               |                  142.3 |                  8.9 |       0.239  |                  0.03   |
-| ZrO2              |                  254   |                 13   |       0.21   |                  0.026  |
-| eutectique_s1     |                  296   |                 30   |       0.165  |                  0.067  |
-| eutectique_s2     |                  309   |                 26   |       0.178  |                  0.052  |
-| eutectique_s3     |                  298   |                 17   |       0.12   |                  0.051  |
-| eutectique_s4     |                  276   |                 21   |       0.229  |                  0.034  |
-| eutectique_s5     |                  279   |                 26   |       0.212  |                  0.041  |
-| fonte             |                  151.7 |                  9.1 |       0.295  |                  0.017  |
-None
-#header thing
-|                   |    "young coefficient" |    "young error 95%" |    "poisson" |    "poisson error 95%"  |
-|-------------------+------------------------+----------------------+--------------+-------------------------|
-| acier_polie       |                  169.3 |                  9   |       0.273  |                  0.017  |
-| acier_ecrouie     |                  172   |                 16   |       0.266  |                  0.03   |
-| acier_striee_para |                  177.9 |                  5.4 |       0.2961 |                  0.0087 |
-| acier_striee_perp |                  201   |                 11   |       0.258  |                  0.021  |
-| aluminium_AG5     |                   69.4 |                  3.3 |       0.292  |                  0.014  |
-| aluminium_AUG4    |                   67.2 |                  4.2 |       0.331  |                  0.012  |
-| cuivre            |                  103   |                 15   |       0.332  |                  0.027  |
-| laiton            |                   94.6 |                  8.8 |       0.35   |                  0.015  |
-| molybdene         |                  300   |                120   |       0.19   |                  0.19   |
-| nickel            |                  218   |                 14   |       0.302  |                  0.016  |
-| tantale           |                  192   |                 16   |       0.339  |                  0.017  |
-| titane            |                  116.9 |                  4.4 |       0.308  |                  0.011  |
-| avec_ito          |                   72.7 |                  2.9 |       0.207  |                  0.02   |
-| sans_ito          |                   74.4 |                  1.5 |       0.174  |                  0.014  |
-| LiNbO3_face_      |                  148.5 |                  7.6 |       0.328  |                  0.011  |
-| LiNbO3_autreface_ |                  153.1 |                  8.9 |       0.328  |                  0.013  |
-| LGT               |                  142.3 |                  8.9 |       0.239  |                  0.03   |
-| ZrO2              |                  254   |                 13   |       0.21   |                  0.026  |
-| eutectique_s1     |                  296   |                 30   |       0.165  |                  0.067  |
-| eutectique_s2     |                  309   |                 26   |       0.178  |                  0.052  |
-| eutectique_s3     |                  298   |                 17   |       0.12   |                  0.051  |
-| eutectique_s4     |                  276   |                 21   |       0.229  |                  0.034  |
-| eutectique_s5     |                  279   |                 26   |       0.212  |                  0.041  |
-| fonte             |                  151.7 |                  9.1 |       0.295  |                  0.017  |
-None
-None
-None
-None
-
 
 \newpage
+
 * Managing references
 ** Installation
 You can install [[https://github.com/jkitchin/org-ref][org-ref]] which provides great... ref tools!
