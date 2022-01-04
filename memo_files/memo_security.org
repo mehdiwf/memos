@@ -1,0 +1,25 @@
+* gpg
+** symetric encryption
+*** encryption of a file
+if you have a file: secret.txt
+to encrypt it:
+=gpg -c --no-symkey-cache --cipher-algo AES256 secret.txt=
+it will alsk you to enter a passphrase
+- -c is for symetric key encryption
+- --no-symkey-cache to not register the passphrase on the machine where
+  the file is encrypted
+- --cipher-algo AES256 to specify the encryption algo, which is more
+  secure than the default
+
+*** directory
+if it's a directory, archive it first:
+=tar -cf pepes.tar.gz rare_pepes/=
+then encrypt it like a file
+*** decryption
+to decrypt it: 
+=gpg secret.txt.gpg=
+*** integrity
+you can use sha256 (?) to check for integrity of your file, if you
+make a sha256 of your file before sending it to a cloud or whatever,
+and then checking the sha of the downloaded file and the sha you
+created before sending.

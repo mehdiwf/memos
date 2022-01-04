@@ -264,6 +264,7 @@ print(loaded_list)
 print(np.array(loaded_numpy))
 #+end_src
 ****** arrays
+******* the naive way
 #+begin_src python :results output
 #!/usr/bin/env python3
 import json
@@ -281,6 +282,101 @@ with open('mydata_numpy.json', 'r') as f:
     loaded_matrix = np.array(json.load(f))
     
 print(loaded_matrix)
+#+end_src
+******* the cool/extensive way
+******** the encoder
+[[https://pynative.com/python-serialize-numpy-ndarray-into-json/][source]]
+you can also define your own custom encoder class thanks to
+json.JSONEncoder:
+#+begin_src python :results output
+import json
+from json import JSONEncoder
+
+class NumpyArrayEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, numpy.ndarray):
+            return obj.tolist()
+        return JSONEncoder.default(self, obj)
+
+# or more general:
+class NumpyEncoder(json.JSONEncoder):
+    """ Special json encoder for numpy types """
+    def default(self, obj):
+        if isinstance(obj, (numpy.int_, numpy.intc, numpy.intp, numpy.int8,
+                            numpy.int16, numpy.int32, numpy.int64, numpy.uint8,
+                            numpy.uint16, numpy.uint32, numpy.uint64)):
+            return int(obj)
+        elif isinstance(obj, (numpy.float_, numpy.float16, numpy.float32,
+                              numpy.float64)):
+            return float(obj)
+        elif isinstance(obj, (numpy.ndarray,)):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+   
+#+end_src
+
+#+RESULTS:
+: Printing JSON serialized NumPy array
+: {"array": [[11, 22, 33], [44, 55, 66], [77, 88, 99]]}
+: Decode JSON serialized NumPy array
+: NumPy Array
+: [[11 22 33]
+:  [44 55 66]
+:  [77 88 99]]
+
+******** in a file
+#+begin_src python :results output
+# or to write to a file:
+# Serialization
+import json
+from json import JSONEncoder
+import numpy
+
+class NumpyArrayEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, numpy.ndarray):
+            return obj.tolist()
+        return JSONEncoder.default(self, obj)
+
+numpyData = {"arrayOne": numpyArrayOne, "arrayTwo": numpyArrayTwo}
+
+with open("numpyData.json", "w") as write_file:
+    json.dump(numpyData, write_file, cls=NumpyArrayEncoder)
+
+# Deserialization
+with open("numpyData.json", "r") as read_file:
+    decodedArray = json.load(read_file)
+    finalNumpyArrayOne = numpy.asarray(decodedArray["arrayOne"])
+#+end_src
+
+******** just like this
+#+begin_src python :results output
+import json
+from json import JSONEncoder
+import numpy
+
+class NumpyArrayEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, numpy.ndarray):
+            return obj.tolist()
+        return JSONEncoder.default(self, obj)
+
+numpyArrayOne = numpy.array([[11, 22, 33], [44, 55, 66], [77, 88, 99]])
+
+# Serialization
+numpyData = {"array": numpyArrayOne}
+encodedNumpyData = json.dumps(numpyData, cls=NumpyArrayEncoder)  # use dump() to write array into file
+print("Printing JSON serialized NumPy array")
+print(encodedNumpyData)
+
+# Deserialization
+print("Decode JSON serialized NumPy array")
+decodedArrays = json.loads(encodedNumpyData)
+
+finalNumpyArray = numpy.asarray(decodedArrays["array"])
+print("NumPy Array")
+print(finalNumpyArray)
 #+end_src
 *** Types and their methods
 **** String
@@ -300,6 +396,31 @@ print(loaded_matrix)
   `.2` signifie que l'on veut une précision de 2 chiffres après la
   virgule, et `f` précise que nos valeurs doivent être interprétées
   comme des flottants.
+***** regular expressions to split
+
+#+begin_src python :results output
+import re
+l = r'truc|--styléaet:chouette'
+print( re.split(r'a|\|--|:', l) ) 
+
+#+end_src
+
+#+RESULTS:
+: ['truc', 'stylé', 'et', 'chouette']
+
+***** Removing/stripping leading/first/last/some character
+#+begin_src python :results output
+l = '00testttt00000'
+print(l.lstrip('0'))
+print(l.rstrip('0'))
+print(l.strip('0'))
+#+end_src
+
+#+RESULTS:
+: testttt00000
+: 00testttt
+: testttt
+
 ***** Joining elements of a list of str
 #+begin_src python :results output
 liste = ["a", "b", "c"]
@@ -790,6 +911,98 @@ df.iloc[3:5, 0:2]
 # with list of int
 df.iloc[[1, 2, 4], [0, 2]]
 #+end_src
+******** more complex slicing/filtering
+:PROPERTIES:
+:keywords: complex customized boolean mask pandas
+:END:
+[[https://pandas.pydata.org/docs/user_guide/indexing.html#boolean-indexing][boolean indexing guide page]]
+List comprehensions and the map method of Series can also be used to
+produce more complex criteria for boolean masks:
+#+begin_src python :results output
+import pandas as pd
+import numpy as np
+df2 = pd.DataFrame({'a': ['one', 'one', 'two', 'three', 'two', 'one', 'six'],
+                    'b': ['x', 'y', 'y', 'x', 'y', 'x', 'x'],
+                    'c': np.random.randn(7)})
+
+
+
+# only want 'two' or 'three'
+criterion = df2['a'].map(lambda x: x.startswith('t'))
+
+print(df2)
+print('---------')
+print(df2[criterion])
+#+end_src
+
+#+RESULTS:
+#+begin_example
+       a  b         c
+0    one  x -0.279617
+1    one  y -1.153427
+2    two  y  0.548806
+3  three  x -0.581544
+4    two  y -1.197354
+5    one  x -0.137980
+6    six  x -1.632937
+---------
+       a  b         c
+2    two  y  0.548806
+3  three  x -0.581544
+4    two  y -1.197354
+#+end_example
+
+******** groupby
+good source:
+https://appdividend.com/2020/06/02/pandas-dataframe-groupby-method-in-python/
+********* groupby
+it returns iterators: group name and group dataframe/series
+#+begin_src python :results output
+import pandas as pd
+
+dataset = {
+    'Name': ['Rohit', 'Arun', 'Sohit', 'Arun', 'Shubh'],
+    'Roll no': ['01', '02', '03', '04', '05'],
+    'maths': ['93', '63', '74', '94', '83'],
+    'science': ['88', '55', '66', '94', '35'],
+    'english': ['93', '74', '84', '92', '87']}
+
+df = pd.DataFrame(dataset)
+by_name = df.groupby(['Name'])
+
+for Name, maths in by_name:
+    print(f"First 2 entries for {Name!r}")
+    print("------------------------")
+    print(maths.head(2), end="\n\n")
+#+end_src
+
+#+RESULTS:
+#+begin_example
+First 2 entries for 'Arun'
+------------------------
+   Name Roll no maths science english
+1  Arun      02    63      55      74
+3  Arun      04    94      94      92
+
+First 2 entries for 'Rohit'
+------------------------
+    Name Roll no maths science english
+0  Rohit      01    93      88      93
+
+First 2 entries for 'Shubh'
+------------------------
+    Name Roll no maths science english
+4  Shubh      05    83      35      87
+
+First 2 entries for 'Sohit'
+------------------------
+    Name Roll no maths science english
+2  Sohit      03    74      66      84
+
+#+end_example
+
+********* getting the values of a group
+
 ******* statistics
 ******** mean
 #+begin_src python :results output

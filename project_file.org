@@ -6,6 +6,7 @@ rm /home/mehdi/dossiers/perso/projets/memos_git/memo_files/*
 
 cp /home/mehdi/dossiers/perso/notes/memo_git.org ./
 cp /home/mehdi/dossiers/perso/notes/memo_linux.org ./
+cp /home/mehdi/dossiers/perso/notes/memo_security.org ./
 cp /home/mehdi/dossiers/perso/notes/emacs/memo_emacs.org ./
 cp /home/mehdi/dossiers/perso/notes/emacs/org_export_memo/memo_orgmode_latex_export.org ./
 cp /home/mehdi/dossiers/perso/workflow.org ./

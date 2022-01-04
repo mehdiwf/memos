@@ -496,43 +496,12 @@ and set a binding for it (for instance here, using general.el:)
  (general-define-key
   "C-c x l" 'lkr/org_export_latex)
 #+end_src
-** python mode                                                          :sci:
+** python mode                                                      :science:
  C-c C-p to start a python shell
  C-c C-c to execute your file
  C-c C-r to execute region
  C-c C-l to execute a file you're not editing
  C-M-x python-shell-send-defun
-** emacs lisp
-*** quotes advice
-**** set
-     (set 'flowers '(rose violet daisy buttercup))
-
-   Note also, that when you use ‘set’, you need to quote both arguments
-to ‘set’, unless you want them evaluated.  Since we do not want either
-argument evaluated, neither the variable ‘flowers’ nor the list ‘(rose
-violet daisy buttercup)’, both are quoted.  (When you use ‘set’ without
-quoting its first argument, the first argument is evaluated before
-anything else is done.  If you did this and ‘flowers’ did not have a
-value already, you would get an error message that the ‘Symbol's value
-as variable is void’; on the other hand, if ‘flowers’ did return a value
-after it was evaluated, the ‘set’ would attempt to set the value that
-was returned.  There are situations where this is the right thing for
-the function to do; but such situations are rare.)
-**** setq
-     (setq carnivores '(lion tiger leopard))
-
-(The ‘q’ in ‘setq’ means ‘quote’.)
-As a practical matter, you almost always quote the first argument to
-‘set’.  The combination of ‘set’ and a quoted first argument is so
-common that it has its own name: the special form ‘setq’.  This special
-form is just like ‘set’ except that the first argument is quoted
-automatically, so you don’t need to type the quote mark yourself.  Also,
-as an added convenience, ‘setq’ permits you to set several different
-variables to different values, all in one expression.
-
-     (setq trees '(pine fir oak maple)
-           herbivores '(gazelle antelope zebra))
-
 ** handling error messages
 you can see a full backtrace of any error with: =debug-on-error= set
 to =t=. To set this variable, you can press C-x C-e at the end of this
