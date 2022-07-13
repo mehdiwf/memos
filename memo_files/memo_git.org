@@ -4,25 +4,38 @@
 * profile
 git config --global user.name "Your Name Here"
 git config --global user.email your@email.com
+git config --global init.defaultBranch main
 
+to disable high security if not needed
+git config --global http.sslverify false
 * project
 ** start
-# starts your git repository in /path/to/project
+starts your git repository in /path/to/project
+#+begin_src 
 cd /path/to/project
 git init
+#+end_src
+here, you create your git repository
+
 ** commiting changes
 *** general idea
  when committing, you need to add files to a stage, then commit.
 
- files/things in directory
+   file1, file2 in directory
          |
-         |   git add
+         |   (user modification on file1)
          v
-   files are added on stage
+   file1 is marked as changed
          |
-         |   git commit
+         |   on CLI: "git add file1"
          v
-  changes stored/applied in your directory
+   file1 changes are added on stage
+         |
+         |   on CLI: "git commit"
+         v
+  changes commited in your repository
+
+anything that changes can be commited (file creation, deletion, modification...)
 
 *** disclaimer
 Remember, anything that is committed in Git can almost always be
@@ -32,24 +45,37 @@ commits that were overwritten with an --amend commit can be recovered
 was never committed is likely never to be seen again.  
 
 *** standard stuff
-# add a file to track (to the 'stage')
+add a file to track (to the 'stage')
+#+begin_src 
 git add file1 file2 
-# add everything in the folder
+#+end_src
+
+add everything in the folder
+#+begin_src 
 git add .
-# commiting with a simple message
+#+end_src
+
+commiting with a simple message
+#+begin_src 
 git commit -m "message"
-# if you want to modify the message in you editor
-# the -a tells git to commit all modified/deleted tracked files
+#+end_src
+
+if you want to modify the message in you editor
+the -a tells git to commit *all* modified/deleted tracked files
+#+begin_src 
 git commit -a 
+#+end_src
 *** correcting last commit
 If you did a commit but fucked up something (you forgot to put
 something in the log message, or to put a modification...)
 You can modify the last commit with 
-=git commit --amend=
+#+begin_src 
+git commit --amend
+#+end_src
 the changes you make between your fucked up commit and your next will
 be merged, overwritting the last commit (if you don't put -m to put a
 message on the cli, you'll get your last message in your editor in
-case you want to modify it put not overwrite it all)
+case you want to modify it but not overwrite it all)
 
 example:
 $ git commit -m 'Initial commit'
@@ -65,7 +91,6 @@ happens when you do this and how to recover if you’re on the receiving
 end read The Perils of Rebasing.  
 
 *** managing the stage
-**** remove from stage
 # Unstaging a Staged File with git restore
 git restore --staged file_to_unstage
 
@@ -77,7 +102,22 @@ particular file, to revert its state to the last commit state.
 # Unmodifying a Modified File with git restore
 git restore file_to_undo_changes
 
+** undoing stuff
+*** last commit
+to delete the *last commit* while preserving the modifications on your
+file: 
+
+#+begin_src 
+git reset "HEAD^"
+#+end_src
+*** file tracking on a file 
+WARNING:
+it also *removes* the file!!!
+#+begin_src 
+git rm -r --cached file_to_remove
+#+end_src
 ** checking the project
+*** in general
 # check status of project
 git status
 # seeing the history of changes
@@ -86,7 +126,8 @@ git log
 git log --pretty=oneline
 # check unstaged changes from last commit
 git diff
-
+*** for one particular commit
+locate the 
 ** branches
 *** intuition
 you can have branches, switch between them, and modify them
@@ -195,8 +236,6 @@ original project repository. You can only read from this remote.
 
 It also adds "origin", pointing to your remote branch where your fork
 lives. You can read and write stuff to this remote.
-
-
 
 * Numerical project course
 ** commit message

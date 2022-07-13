@@ -19,6 +19,15 @@ if __name__ == '__main__':
 
 #+end_src
 ** General
+*** Version of modules/packages
+#+begin_src python :results output
+import numpy as np
+print(np.__version__)
+#+end_src
+
+#+RESULTS:
+: 1.21.4
+
 *** Files
 **** Listing files
 ***** All files
@@ -263,6 +272,24 @@ print(loaded_list)
 
 print(np.array(loaded_numpy))
 #+end_src
+****** datetime
+
+#+begin_src python :results output
+import json
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, z):
+        if isinstance(z, datetime.datetime):
+            return (z.isoformat())
+        else:
+            return super().default(z)
+
+
+my_dict = {'date': datetime.datetime.now()}
+
+print(json.dumps(my_dict,cls=DateTimeEncoder))
+#+end_src
+
 ****** arrays
 ******* the naive way
 #+begin_src python :results output
@@ -285,70 +312,80 @@ print(loaded_matrix)
 #+end_src
 ******* the cool/extensive way
 ******** the encoder
+********* encoder
 [[https://pynative.com/python-serialize-numpy-ndarray-into-json/][source]]
 you can also define your own custom encoder class thanks to
 json.JSONEncoder:
+
+create a file called json_encoder.py in your project
+
 #+begin_src python :results output
+import numpy as np
 import json
-from json import JSONEncoder
 
-class NumpyArrayEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, numpy.ndarray):
-            return obj.tolist()
-        return JSONEncoder.default(self, obj)
-
-# or more general:
 class NumpyEncoder(json.JSONEncoder):
     """ Special json encoder for numpy types """
     def default(self, obj):
-        if isinstance(obj, (numpy.int_, numpy.intc, numpy.intp, numpy.int8,
-                            numpy.int16, numpy.int32, numpy.int64, numpy.uint8,
-                            numpy.uint16, numpy.uint32, numpy.uint64)):
+        if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
+                            np.int16, np.int32, np.int64, np.uint8,
+                            np.uint16, np.uint32, np.uint64)):
             return int(obj)
-        elif isinstance(obj, (numpy.float_, numpy.float16, numpy.float32,
-                              numpy.float64)):
+        elif isinstance(obj, (np.float_, np.float16, np.float32,
+                              np.float64)):
             return float(obj)
-        elif isinstance(obj, (numpy.ndarray,)):
+        elif isinstance(obj, (np.ndarray,)):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
-
-   
 #+end_src
 
-#+RESULTS:
-: Printing JSON serialized NumPy array
-: {"array": [[11, 22, 33], [44, 55, 66], [77, 88, 99]]}
-: Decode JSON serialized NumPy array
-: NumPy Array
-: [[11 22 33]
-:  [44 55 66]
-:  [77 88 99]]
-
-******** in a file
+********* another one, more simple
 #+begin_src python :results output
-# or to write to a file:
-# Serialization
+import numpy as np
 import json
 from json import JSONEncoder
-import numpy
 
 class NumpyArrayEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, numpy.ndarray):
             return obj.tolist()
         return JSONEncoder.default(self, obj)
+#+end_src
+******** encoding and decoding a file
+if you created the encoder in a file json_encoder.py
+(cf last header to get the content of json_encoder.py)
+#+begin_src python :results output
+import json_encoder
+import numpy as np
 
-numpyData = {"arrayOne": numpyArrayOne, "arrayTwo": numpyArrayTwo}
+numpy_data = np.array([1,2])
+
+# to write to a file:
+with open("json_filename.json", "w") as write_file:
+    json.dump(numpy_data,
+              write_file,
+              cls=json_encoder.NumpyEncoder)
+    
+# it also works with a dictionnary
+numpy_dic = {"arrayOne": numpy_data, "arrayTwo": numpy_data*2}
 
 with open("numpyData.json", "w") as write_file:
-    json.dump(numpyData, write_file, cls=NumpyArrayEncoder)
+    json.dump(numpy_dic,
+              write_file,
+              cls=NumpyArrayEncoder)
 
-# Deserialization
+# decoding a file
 with open("numpyData.json", "r") as read_file:
-    decodedArray = json.load(read_file)
-    finalNumpyArrayOne = numpy.asarray(decodedArray["arrayOne"])
+    decoded_numpy_dic = json.load(read_file)
+    finalNumpyArrayOne = numpy.asarray(decoded_numpy_dic["arrayOne"])
+
+# tip: you can do something like
+for key in decoded_numpy_dic.keys():
+    if 'array' in key:
+        decoded_numpy_dic[key] = np.asarray(decoded_numpy_dic[key])
+    
 #+end_src
+
+#+RESULTS:
 
 ******** just like this
 #+begin_src python :results output
@@ -1075,67 +1112,76 @@ pour faire un test:
 #assert sys.version_info >= (2, 5),"your version is less than 2.5"
 #+end_src
 *** Plot graph
-**** refrences
 https://scipy-lectures.org/intro/matplotlib/
 https://towardsdatascience.com/an-introduction-to-making-scientific-publication-plots-with-python-ea19dfa7f51e
-**** example graph
+**** cheatsheet
+***** simple subplot
 #+begin_src python :results output
-#tracer un truc :
-import matplotlib.pyplot as plt
+# sharex if you want them to share the same x axis
+fig, axs = plt.subplots(2, sharex=True)
 
-fig = plt.figure(figsize=(10,10))
+axs[0].plot(x, y,
+            label=r'$\alpha$')
+axs[0].set_title('Axis 0')
+axs[0].grid(visible = True, linestyle = '--')
 
-ax = fig.add_subplot(1,2,1)
-ax.scatter(liste_U,liste_I)
-ax.plot(liste_U,liste_Iref)
-ax.set_xlabel('Tension (V)')
-ax.set_ylabel('Intensité (A)')
+axs[1].plot(x, y, 'tab:orange')
+axs[1].set_yscale('log')
+axs[1].set_title('Axis 1')
 
-ax = fig.add_subplot(1,2,2)
-plt.yscale('log')
-ax.scatter(liste_U,liste_I)
-ax.plot(liste_U,liste_Iref)
-ax.set_xlabel('Tension (V)')
-ax.set_ylabel('Intensité (A)')
-    
-#plus de contenu :
-    
-ax = fig.add_subplot(1,2,1)
-ax.plot(Resultat[:,0],Resultat[:,2],label='angle :{:.2f}°'.format(angle*180/np.pi))
-ax.set_xlabel('x(m)')
-ax.set_ylabel('y(m)')
-ax.legend()
+# to put a legend for all of them
+for ax in axs.flat:
+    ax.set(xlabel='x-label', ylabel='y-label')
 
-ax = fig.add_subplot(3,2,2)
-ax.set_xlabel('t(s)')
-ax.set_ylabel('Re')
-ax.plot(time,liste_Re)
+# Hide x labels and tick labels for top plots and y ticks for right plots.
+for ax in axs.flat:
+    ax.label_outer()
 
-ax = fig.add_subplot(3,2,4)
-ax.set_xlabel('t(s)')
-ax.set_ylabel('Vx(m/s)')
-ax.plot(  time[:Resultat[:,1].size]  ,  Resultat[:,1])
-
-ax = fig.add_subplot(3,2,6)
-ax.set_xlabel('t(s)')
-ax.set_ylabel('Vy(m/s)')
-ax.plot(  time[:Resultat[:,3].size]  ,Resultat[:,3]  )
-
+fig.savefig('path/plot.pdf')
 #+end_src
-**** plot specific things
-plot logarithm x or y
+***** 2x2 subplot
 #+begin_src python :results output
-x_array = 1.2**np.arange(-20,11)
-y_array = function(k_array)
-plot = plt.plot(x_array,y_array)
-
-plt.semilogx()
-
-plt.show()
+# for a 2x2 plot:
+fig, axs = plt.subplots(2,2, sharex=True)
+axs[0,1].plot(...)
 #+end_src
+***** more designable subplots gridspec
+this does something like:
 
-#+RESULTS:
+#+begin_comment
+._______.
+._______.
+._______. ._.
+.       . . .
+.       . . . 
+.       . . .
+._______. ._.
+#+end_comment
 
+#+begin_src python :results output
+fig = plt.figure(figsize = (8, 8),
+                 constrained_layout=True)
+# this lets you divide your figure wiht a 5*5 grid,
+# letting you customize the size of your axes/subplots in it
+gs = fig.add_gridspec(5, 5)
+# this subplot is:
+# all lines but the first,
+# all columns but the last.
+ax_scatter = fig.add_subplot(gs[1:, :-1])
+# this subplot is:
+# first line,
+# all columns but the last.
+# you can also share an axis with another subplot with sharex/sharey
+ax_xbin = fig.add_subplot(gs[0, :-1], sharex=ax_scatter)
+# this subplot is:
+# all lines but the first,
+# last column
+ax_ybin = fig.add_subplot(gs[1:, -1], sharey=ax_scatter)
+ax_scatter.grid(visible = True, linestyle = 'dotted')
+ax_xbin.grid(visible = True)
+ax_ybin.grid(visible = True)
+#+end_src
+**** list of options for often used options for plot
 **** latex in plots
 it's with =r"I want write in $LaTeX$"= !
 example:
@@ -1175,6 +1221,26 @@ except ImportError:
     from defaultlib import abc as foo
 #+end_src
 ** Particular
+*** image brightness (wallpaper)
+#+begin_src python :results 
+import cv2
+import numpy as np
+
+def compute_brightness(image):
+    """return an array with the perceived brightness of each pixel from a
+    numpy image
+    """
+    brightness  =  np.sqrt( 0.241*image[:,:,0] + 0.691*image[:,:,1] + 0.068*image[:,:,2])
+    return brightness
+
+def compute_light_level(image_path):
+    max_score = np.sqrt( .241*255 + .691*255 + .068*255 )
+    image = cv2.imread(image_path)
+    brightness = compute_brightness(image)
+    score = brightness.mean()
+    level = score/max_score
+    return level
+#+end_src
 *** Progress bar
 #+begin_src python :results output
 import sys
@@ -1209,30 +1275,32 @@ if __name__ == "__main__":
 *** bash
 get bash output 
 and run bash command
-https://stackoverflow.com/questions/163542/how-do-i-pass-a-string-into-subprocess-popen-using-the-stdin-argument
+https://unix.stackexchange.com/questions/190495/how-to-execute-a-bash-command-in-a-python-script
 
 #+begin_src python :results output
-#!/usr/bin/env python3
-from subprocess import run, PIPE
+import subprocess
 
-p = run(['grep', 'f'], stdout=PIPE,
-        input='one\ntwo\nthree\nfour\nfive\nsix\n', encoding='ascii')
-print(p.returncode)
-# -> 0
-print(p.stdout)
-# -> four
-# -> five
-# -> 
-
+res = subprocess.check_output(["ls", "-l"])
+for line in res.splitlines():
+    print(line)
 #+end_src
 * pip and packages
+** opencv
+
+source:
+https://forum.qt.io/topic/119109/using-pyqt5-with-opencv-python-cv2-causes-error-could-not-load-qt-platform-plugin-xcb-even-though-it-was-found/9
+
+problem when showing an image, solution:
+- uninstall opencv-python
+- install opencv-python-headless
 ** pip
 dont forget to install pip via your package manager...
 ** upgrade packages
 upgrade python packages: 
 write that in shell
+[[https://www.studytonight.com/python-howtos/upgrade-all-packages-in-python-using-pip][source]]
 #+begin_comment
-python3 -m pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 python3 -m pip install -U
+pip3 list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1 | xargs -n1 pip3 install -U 
 #+end_comment
 
 * Other
@@ -1324,24 +1392,86 @@ class Earth(Planet):
         return self.x
 #+end_src
 
-***** class overloading
+***** class operators overloading
+****** documentation
+documentation: [[https://docs.python.org/3/reference/datamodel.html#object.__getitem__][python website]]
+****** example with == + * / ...
+example:
 str len in ect... make them work for your class
 print(object_of_your_class)
 #+begin_src python :results output
 class Planet():
-    def __init__(self):
-        self.x = 3
-        self.y = 4
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
     def getx(self):
         return self.x
     def __str__(self):
-        return "thing"
+        return f"x:{self.x}\ny:{self.y}"
+    # Planet1 == Planet2
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+    # Planet1 + Planet2
+    def __add__(self, other):
+        return Point(self.x + other.x, self.y + other.y)
+    # Planet1 - Planet2
+    def __sub__(self, other):
+        return Point(self.x + other.x, self.y + other.y)
+    # Planet1 * Planet2
+    def __mul__(self, other):
+        return self.x * other.x + self.y * other.y
+    # Planet1 > Planet2
+    def __gt__(self, other):  # greater than
+        return self.length() > other.length()
+    # Planet1 >= Planet2
+    def __ge__(self, other):  # greater than or equal to
+        return self.length() >= other.length()
+    # Planet1 < Planet2        
+    def __lt__(self, other):  # less than
+        return self.length() < other.length()
+    # Planet1 <= Planet2
+    def __le__(self, other):  # less than or equal to
+        return self.length() <= other.length()
+    
 my_planet = Planet()
 print(my_planet)
 #+end_src
 
 #+RESULTS:
-: thing
+: x:3
+: y:4
+
+****** example with Object[key]
+[[https://stackoverflow.com/questions/33881694/overloading-the-operator-in-python-class-to-refer-to-a-numpy-array-data-membe][source]]
+#+begin_src python :results output
+import numpy as np
+
+class MyArray():
+    def __init__(self):
+        self.data = np.zeros(10)
+
+    def __getitem__(self, key):
+        return self.data[key]
+
+    def __setitem__(self, key, value):
+        self.data[key] = value
+
+    def __repr__(self):
+        return 'MyArray({})'.format(self.data)
+
+
+a = MyArray()
+
+print(a[9])
+print(a[1:5])
+a[:] = np.arange(10)
+print(a)
+#+end_src
+
+#+RESULTS:
+: 0.0
+: [0. 0. 0. 0.]
+: MyArray([0. 1. 2. 3. 4. 5. 6. 7. 8. 9.])
 
 *** conventions in programming
 if you put _ in the beginning of a variable, it's like saying "please

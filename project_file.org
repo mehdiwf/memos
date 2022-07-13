@@ -1,15 +1,23 @@
 * Get the files
 updates the files 
+
+/home/mehdi/dossiers/perso/notes/
+
+/home/mehdi/dossiers/perso/notes/beepboop/memos/
+
 #+begin_src bash
 cd /home/mehdi/dossiers/perso/projets/memos_git/memo_files/
 rm /home/mehdi/dossiers/perso/projets/memos_git/memo_files/*
 
-cp /home/mehdi/dossiers/perso/notes/memo_git.org ./
-cp /home/mehdi/dossiers/perso/notes/memo_linux.org ./
-cp /home/mehdi/dossiers/perso/notes/memo_security.org ./
-cp /home/mehdi/dossiers/perso/notes/emacs/memo_emacs.org ./
-cp /home/mehdi/dossiers/perso/notes/emacs/org_export_memo/memo_orgmode_latex_export.org ./
-cp /home/mehdi/dossiers/perso/workflow.org ./
+
+
+cp /home/mehdi/dossiers/perso/notes/beepboop/memos/memo_git.org ./
+cp /home/mehdi/dossiers/perso/notes/beepboop/memos/memo_linux.org ./
+cp /home/mehdi/dossiers/perso/notes/beepboop/memos/memo_security.org ./   
+cp /home/mehdi/dossiers/perso/notes/beepboop/emacs/memo_emacs.org ./
+cp /home/mehdi/dossiers/perso/notes/beepboop/emacs/org_export_memo/memo_orgmode_latex_export.org ./
+
+cp /home/mehdi/dossiers/perso/notes/beepboop/memos/workflow.org ./
 
 cp /home/mehdi/dossiers/programmation/memo_prog.org ./
 cp /home/mehdi/dossiers/programmation/python/python_ref.org ./

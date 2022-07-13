@@ -500,3 +500,46 @@ docker cp containerID:/path/to/input/file ./path/to/destination
 docker rmi --force ImageID/ImageName
 #+end_src
 
+
+*** inkscape
+export everything: if you have something like:
+
+#+begin_comment
+.
+├── export_script.py
+├── figs
+│   ├── light_sheet_dimensions.pdf
+│   ├── light_sheet_dimensions_v2.pdf
+│   └── topview_montage.pdf
+├── sources
+│   ├── figs
+│   │   ├── light_sheet_dimensions.svg
+│   │   ├── light_sheet_dimensions_v2.svg
+│   │   └── topview_montage.svg
+│   └── sup
+│       └── topview_depth_of_field_and_lihgtsheet.svg
+└── sup
+    └── topview_depth_of_field_and_lihgtsheet.pdf
+
+5 directories, 9 files
+#+end_comment
+
+to convert everything from the source directory and put them in their
+respective folders (figs or sup)
+
+#+begin_src python :results output
+import subprocess
+# requirements: fd package for linux, inkscape
+res = subprocess.check_output(["fd",
+                               ".",
+                               "sources"])
+file_list = [line.decode() for line in res.splitlines()]
+
+for file_path in file_list:
+    if file_path.endswith('.svg'):
+        outputfile_path = f'{file_path[8:-4]}.pdf'
+        res = subprocess.check_output([f"inkscape",
+                                       file_path,
+                                       "-o",
+                                       outputfile_path])
+#+end_src

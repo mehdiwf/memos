@@ -173,6 +173,9 @@ cp sourcefile outputfile
 
 \newpage
 
+** export tables correctly
+advices here
+[[https://emacs.stackexchange.com/questions/46524/org-mode-how-to-position-tables-correctly-when-exporting-to-latex][stachexchange link]]
 * Managing references
 ** Installation
 You can install [[https://github.com/jkitchin/org-ref][org-ref]] which provides great... ref tools!

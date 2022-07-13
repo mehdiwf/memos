@@ -234,11 +234,54 @@ number.
 The print statement prints a record followed by " -|" into a file that
 contains the record number in its name.
 
+** pdf
+pdftk
+** images
+*** selecting stuff with imv
+*if you have a lot to select*
+in a directory with images:
+#+begin_src bash
+imv -l *
+#+end_src
+
+press 'x' to close the images you don't want, and then 'q', and the
+list of remaining unclosed images will print in stdout
+
+---------------------------------------------------------------------
+*if you have few to select*
+or if you want to only select some:
+#+begin_src 
+imv *
+#+end_src
+and press 'p' to print the name of the file in stdout
+** rsync
+[[https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories][source]]
+be careful to put the / after source dir!
+- a is for archive, it keeps the author, persmission, timestamps...
+- z is to compress the transfered files, which reduces the transfer
+- P to show progress and to enable you to resume interrupted transfer
+#+begin_src
+rsync -azP source_dir/ destination_dir
+#+end_src
+by default, rsync doesn't delete files if they are no longer in the
+source. You can change this behavior with (but try to do it with
+--dry-run first so you can see if important files are removed or not)
+the flag --delete
+
+(DO IT FIRST WITH A DRY RUN!)
+#+begin_src
+rsync -azP --delete source_dir/ destination_dir
+#+end_src
 ** search into recipes
 
 #+begin_src bash
 read search_string
 cat $(rg -il $search_string | fzf)
+#+end_src
+
+** unzip all zip file in a created folder for each
+#+begin_src bash
+for f in *.zip; do unzip -d "${f%*.zip}" "$f"; done
 #+end_src
 
 ** replace all occurences in all files

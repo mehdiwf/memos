@@ -455,14 +455,18 @@ to kill rectangle selected
  M-x whitespace-mode
 *** Automating with macros                                              :sci:
 **** Basics
- C-x (
  to begin to record a macro
+C-x (
+
+to end the recording
  C-x )
- to end the recording
- C-x e
+
  to play a macro
- C-x C-k n
+C-x e
+
  to save a macro as an interactive command in emacs (callable with M-x)
+C-x C-k n
+
  REMINDER:
  C-u n COMMAND
  to repeat n times the command COMMAND ;)
@@ -1242,6 +1246,13 @@ https://emacs.stackexchange.com/questions/28548/how-to-archive-all-completed-tas
     M DONE to show everything matching a TODO keyword (search for DONE items in the current sub-tree)
     * to mark everything in the agenda (all DONE items in the current subtree).
     B $ to bulk archive everything you marked (i.e. everything)
+
+** convertions
+*** jupyter to org mode
+#+begin_src bash
+jupyter nbconvert notebook.ipynb --to markdown
+pandoc notebook.md -o notebook.org
+#+end_src
 
 * Other emacs plugin
 ** org-.* packages
