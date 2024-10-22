@@ -1527,6 +1527,11 @@ into that
    in one buffer. and another buffer shows the changes about to be
    committed. finish with C-c C-c
  - r: rebase popup
+** pyvenv
+python environment for emacs
+
+"M-x pyvenv-activate" and then select the environment directory needed
+
 ** lsp-mode
 *** setup (system crafters)
  video used: https://www.youtube.com/watch?v=jPXIP46BnNA&t=323s

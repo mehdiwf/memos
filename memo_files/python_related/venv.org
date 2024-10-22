@@ -1,0 +1,35 @@
+* how to use
+** create venv dir
+python 3.4+
+#+begin_src 
+python -m venv venv_directory
+#+end_src
+
+it creates a venv with a symlink to the python version you created the
+venv with!
+
+** activate
+when you do that, your PATH variable is changed!
+#+begin_src 
+source venv_directory/bin/activate
+#+end_src
+** install stuff
+now you can install whatever packages you want as would normally, with pip
+** deactivate
+#+begin_src 
+deactivate
+#+end_src
+** delete venv dir
+#+begin_src 
+rm -r venv_directory
+#+end_src
+* with jupyter
+** use a venv environment in a jupyter notebook
+https://stackoverflow.com/questions/55448244/using-virtualenv-on-jupyter-notebook
+#+begin_src 
+python -m venv venv
+source venv/bin/activate
+pip install jupyter
+ipython kernel install --user --name=venv
+jupyter notebook
+#+end_src
