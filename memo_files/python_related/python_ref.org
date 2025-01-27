@@ -632,6 +632,8 @@ gets the indices (rows columns) of elements of tri equal to i
 https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_almost_equal.html
        np.almost equal or something sometimes
        
+****** np.allclose
+comparing elements with a tolerance
 **** pile/"rope" structure
 #+begin_src python :results output
 from collections import deque
