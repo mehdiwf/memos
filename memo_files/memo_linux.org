@@ -271,6 +271,30 @@ or if you want to only select some:
 imv *
 #+end_src
 and press 'p' to print the name of the file in stdout
+** tar
+*** compressing archives or tarballs
+c for create, z for compress (gunzip), f for filename of the archive name
+
+add v just before "f" if you want verbose
+
+#+begin_src
+tar -czf my_archive.tgz stuff_to_archive
+#+end_src
+
+or 
+#+begin_src
+tar -czf my_archive.tar.gz stuff_to_archive
+#+end_src
+*** extracting, decompressing tar
+#+begin_src
+tar -xzf my_archive.tar.gz
+#+end_src
+
+to a specific folder:
+
+#+begin_src
+tar -xzf my_archive.tar.gz -C /output_folder
+#+end_src
 ** rsync
 [[https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories][source]]
 be careful to put the / after source dir!
