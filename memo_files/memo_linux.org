@@ -285,6 +285,11 @@ or
 #+begin_src
 tar -czf my_archive.tar.gz stuff_to_archive
 #+end_src
+
+maximum compression:
+#+begin_src
+env GZIP=-9 tar -czf my_archive.tgz stuff_to_archive
+#+end_src
 *** extracting, decompressing tar
 #+begin_src
 tar -xzf my_archive.tar.gz
