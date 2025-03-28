@@ -1,0 +1,35 @@
+* exporting keys
+
+source: https://unix.stackexchange.com/questions/481939/how-to-export-a-gpg-private-key-and-public-key-to-a-file
+
+Export Public Key
+
+This command will export an ascii armored version of the public key:
+
+gpg --output public.pgp --armor --export username@email
+
+Export Secret Key
+
+This command will export an ascii armored version of the secret key:
+
+gpg --output private.pgp --armor --export-secret-key username@email
+
+Security Concerns, Backup, and Storage
+
+A PGP public key contains information about one's email address. This is generally acceptable since the public key is used to encrypt email to your address. However, in some cases, this is undesirable.
+
+For most use cases, the secret key need not be exported and should not be distributed. If the purpose is to create a backup key, you should use the backup option:
+
+gpg --output backupkeys.pgp --armor --export-secret-keys --export-options export-backup user@email
+
+This will export all necessary information to restore the secrets keys including the trust database information. Make sure you store any backup secret keys off the computing platform and in a secure physical location.
+
+If this key is important to you, I recommend printing out the key on paper using paperkey. And placing the paper key in a fireproof/waterproof safe.
+
+Public Key Servers
+
+In general, it's not advisable to post personal public keys to key servers. There is no method of removing a key once it's posted and there is no method of ensuring that the key on the server was placed there by the supposed owner of the key.
+
+It is much better to place your public key on a website that you own or control. Some people recommend keybase.io for distribution. However, that method tracks participation in various social and technical communities which may not be desirable for some use cases.
+
+For the technically adept, I personally recommend trying out the webkey domain level key discovery service.
