@@ -205,6 +205,9 @@ awful.spawn.with_shell("nm-applet")
 xset r rate 220
 in command line, pretty good
 * General tips
+** xargs
+*** xargs, slurm jobs, and awk to select jobid
+squeue --me --format="%.7i %.9P %.25j %.8u %.2t %.10M %.6D %.4C %N %R" | awk 'NR > 1 {print $1}' | xargs -I @ sh -c "scontrol update jobid=@ TimeLimit=0-1:20:00"
 ** awk
 *** basic stuff
 in command line:

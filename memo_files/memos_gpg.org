@@ -1,3 +1,16 @@
+* verifying .sig file
+helped by
+https://www.youtube.com/watch?v=YKTw4C0_kBM
+and
+https://stackoverflow.com/questions/5701388/where-can-i-find-the-public-key-for-gnu-emacs
+
+install gpg keyring in : 
+https://ftp.gnu.org/gnu/gnu-keyring.gpg
+#+begin_src 
+gpg --import gnu-keyring.gpg
+
+gpg --verify emacs-30.1.tar.gz.sig
+#+end_src
 * exporting keys
 
 source: https://unix.stackexchange.com/questions/481939/how-to-export-a-gpg-private-key-and-public-key-to-a-file
